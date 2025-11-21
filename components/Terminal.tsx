@@ -1,0 +1,268 @@
+
+import React, { useState, useEffect, useRef, useCallback } from 'react';
+import { TerminalLine } from './terminal/TerminalTypes';
+import { useFileSystem } from './terminal/FileSystem';
+import { SystemPanic } from './terminal/commands/FunCommands';
+import { TopBar } from './terminal/ui/TopBar';
+import { Prompt } from './terminal/ui/Prompt';
+import { useMatrixEffect } from './terminal/hooks/useMatrixEffect';
+import { useBootSequence } from './terminal/hooks/useBootSequence';
+import { useCommandLogic } from './terminal/hooks/useCommandLogic';
+
+interface TerminalProps {
+  onClose: () => void;
+}
+
+const Terminal: React.FC<TerminalProps> = ({ onClose }) => {
+  // Phases: static (glitch) -> boot (logs) -> login (prompt) -> shell (interactive)
+  const [phase, setPhase] = useState<'static' | 'boot' | 'login' | 'shell'>('static');
+  
+  const [lines, setLines] = useState<TerminalLine[]>([]);
+  const [input, setInput] = useState('');
+  const [cursorPos, setCursorPos] = useState(0);
+  const [isMaximized, setIsMaximized] = useState(false);
+  const [matrixMode, setMatrixMode] = useState(false);
+  const [bsodTriggered, setBsodTriggered] = useState(false);
+  
+  const [activeComponent, setActiveComponent] = useState<React.ReactNode | null>(null);
+  const [currentPath, setCurrentPath] = useState<string[]>(['~', 'portfolio']);
+  
+  const inputRef = useRef<HTMLInputElement>(null);
+  const scrollRef = useRef<HTMLDivElement>(null);
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+
+  const fileSystem = useFileSystem();
+
+  const scrollToBottom = useCallback(() => {
+      // Use requestAnimationFrame to ensure the DOM has updated before scrolling
+      requestAnimationFrame(() => {
+          if (scrollRef.current) {
+              scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
+          }
+      });
+  }, []);
+
+  // Custom Hooks
+  useMatrixEffect(canvasRef, matrixMode, isMaximized);
+  useBootSequence(phase, setPhase, setLines, scrollToBottom);
+  
+  const { 
+    handleCommand, 
+    handleTabCompletion, 
+    handleHistoryUp, 
+    handleHistoryDown 
+  } = useCommandLogic({
+    lines, setLines,
+    currentPath, setCurrentPath,
+    activeComponent, setActiveComponent,
+    setMatrixMode, setBsodTriggered,
+    setInput, setCursorPos,
+    onClose, scrollToBottom,
+    fileSystem
+  });
+
+  // --- Global Key Listener for Login Phase ---
+  useEffect(() => {
+      if (phase !== 'login') return;
+
+      const handleGlobalKeyDown = (e: KeyboardEvent) => {
+          if (e.key === 'Enter') {
+              setPhase('shell');
+              // Clear logs and set the welcome message
+              setLines([
+                  { type: 'system', content: <div className="opacity-70 mt-2 mb-2">Access Granted. Welcome to <span className="text-blue-400 font-bold">AnkitOS v2.4</span>. Type <span className="text-yellow-400 font-bold">help</span> for list of executables.</div> }
+              ]);
+              setCursorPos(0);
+          } else if (e.key === 'Escape') {
+              onClose();
+          }
+      };
+
+      window.addEventListener('keydown', handleGlobalKeyDown);
+      return () => window.removeEventListener('keydown', handleGlobalKeyDown);
+  }, [phase, onClose]);
+
+
+  // --- Interaction ---
+  useEffect(() => {
+    if (phase === 'shell' || phase === 'boot') {
+        scrollToBottom();
+    }
+  }, [lines, phase, input, activeComponent, scrollToBottom]);
+
+  const focusInput = () => {
+    if (phase === 'shell' && !activeComponent) {
+      inputRef.current?.focus();
+    }
+  };
+
+  const handleSelect = (e: React.SyntheticEvent<HTMLInputElement>) => {
+      setCursorPos(e.currentTarget.selectionStart || 0);
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    // Check for Copy shortcut (Ctrl+C)
+    if (e.key === 'c' && (e.ctrlKey || e.metaKey)) {
+         if (window.getSelection()?.toString()) {
+             return;
+         }
+         setLines(prev => [...prev, { type: 'input', content: input + '^C' }]);
+         setInput('');
+         setCursorPos(0);
+         return;
+    }
+
+    if (e.key === 'Enter') {
+      handleCommand(input);
+      setInput('');
+      setCursorPos(0);
+    } else if (e.key === 'Tab') {
+      e.preventDefault();
+      handleTabCompletion(input);
+    } else if (e.key === 'ArrowUp') {
+      e.preventDefault();
+      handleHistoryUp();
+    } else if (e.key === 'ArrowDown') {
+      e.preventDefault();
+      handleHistoryDown();
+    }
+  };
+
+  // Styles
+  const bgColor = matrixMode ? 'bg-black' : 'bg-[#1a1b26]';
+  const textColor = matrixMode ? 'text-green-500' : 'text-[#a9b1d6]';
+
+  // --- Static / Glitch Screen Render ---
+  if (phase === 'static') {
+      return (
+          <div className="fixed inset-0 z-[100] bg-black flex items-center justify-center overflow-hidden">
+              <div className="absolute inset-0 opacity-20 pointer-events-none" style={{
+                  backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E")`
+              }}></div>
+              <div className="relative text-white font-mono text-4xl font-bold animate-pulse tracking-widest glitch-text">
+                  SYSTEM BOOT
+              </div>
+              <div className="absolute inset-0 bg-gradient-to-b from-transparent via-white/10 to-transparent h-[20px] w-full animate-[scan_2s_linear_infinite]"></div>
+          </div>
+      );
+  }
+
+  return (
+    <div 
+      className={`fixed z-[100] ${bgColor} ${textColor} font-mono p-4 sm:p-8 overflow-hidden flex flex-col transition-all duration-300 animate-in fade-in zoom-in-95 ${isMaximized ? 'inset-0' : 'inset-0'}`}
+      onClick={focusInput}
+      style={{ 
+          fontFamily: "'Fira Code', 'JetBrains Mono', monospace",
+          textShadow: matrixMode ? '0 0 8px rgba(34, 197, 94, 0.8)' : 'none'
+      }}
+    >
+      {bsodTriggered && <SystemPanic onReset={() => {
+          setBsodTriggered(false);
+          setPhase('static');
+          setLines([]);
+      }} />}
+
+      {matrixMode && (
+          <canvas ref={canvasRef} className="absolute inset-0 pointer-events-none z-[1]" />
+      )}
+
+      <div className="absolute inset-0 pointer-events-none z-[110] opacity-10" style={{
+          background: "linear-gradient(to bottom, rgba(255,255,255,0), rgba(255,255,255,0) 50%, rgba(0,0,0,0.2) 50%, rgba(0,0,0,0.2))",
+          backgroundSize: "100% 4px"
+      }}></div>
+
+      <TopBar 
+        onClose={onClose} 
+        isMaximized={isMaximized} 
+        setIsMaximized={setIsMaximized} 
+        phase={phase} 
+        path={currentPath} 
+      />
+
+      <div 
+        ref={scrollRef}
+        className="flex-1 overflow-y-auto custom-scrollbar mt-6 pb-4 relative z-10"
+      >
+        {/* Boot Sequence & Output */}
+        {lines.map((line, i) => {
+            if (line.type === 'boot') {
+                return (
+                    <div key={i} className={`flex items-center gap-2 text-xs sm:text-sm mb-1 font-mono ${matrixMode ? 'text-green-800' : 'text-slate-400'}`}>
+                        <span className="min-w-[100px] text-right opacity-50 select-none shrink-0">[{line.timestamp}]</span>
+                        <span>{line.content}</span>
+                    </div>
+                );
+            } else if (line.type === 'system') {
+                return (
+                    <div key={i} className="mb-2 ml-1 font-mono">
+                        {line.content}
+                    </div>
+                );
+             } else if (line.type === 'input') {
+                return (
+                    <div key={i} className="mt-2">
+                        <Prompt command={line.content as string} path={currentPath} matrixMode={matrixMode} />
+                    </div>
+                )
+            } else {
+                return (
+                    <div key={i} className="mb-2 ml-1 font-mono text-sm sm:text-base">
+                        {line.content}
+                    </div>
+                )
+            }
+        })}
+
+        {/* Login Prompt */}
+        {phase === 'login' && (
+            <div className="mt-12 flex flex-col items-center justify-center h-32 animate-pulse">
+                <div className="text-green-400 font-bold text-xl mb-2">SYSTEM READY</div>
+                <div className="text-slate-400">PRESS <span className="bg-slate-700 text-white px-1 rounded text-xs">ENTER</span> TO INITIALIZE SHELL</div>
+                <div className="text-slate-600 text-xs mt-4">PRESS <span className="bg-slate-800 px-1 rounded">ESC</span> TO ABORT</div>
+            </div>
+        )}
+
+        {/* Active Shell Prompt OR Active Blocking Component */}
+        {phase === 'shell' && (
+          <div className="mt-2">
+            {activeComponent ? (
+                <div className="mb-2">{activeComponent}</div>
+            ) : (
+              <div className="flex items-center">
+                <div className="flex-shrink-0">
+                    <Prompt path={currentPath} matrixMode={matrixMode} />
+                </div>
+                <div className="relative flex-1 ml-2">
+                <input
+                    ref={inputRef}
+                    type="text"
+                    value={input}
+                    onChange={(e) => {
+                        setInput(e.target.value);
+                        setCursorPos(e.target.selectionStart || 0);
+                    }}
+                    onSelect={handleSelect}
+                    onClick={handleSelect}
+                    onKeyUp={handleSelect}
+                    onKeyDown={handleKeyDown}
+                    className={`w-full bg-transparent border-none outline-none ${matrixMode ? 'text-green-500' : 'text-slate-200'} caret-transparent font-mono text-sm sm:text-base`}
+                    autoFocus
+                    spellCheck={false}
+                    autoComplete="off"
+                />
+                {/* Custom Block Cursor Overlay */}
+                <div className={`absolute pointer-events-none left-0 top-0 h-full flex items-center whitespace-pre font-mono text-sm sm:text-base ${matrixMode ? 'text-green-500' : 'text-slate-200'}`}>
+                     <span className="opacity-0">{input.substring(0, cursorPos)}</span>
+                     <span className={`block w-[1ch] h-[1.2em] -mb-[0.15em] ${matrixMode ? 'bg-green-500' : 'bg-slate-400'} animate-pulse opacity-70`}></span>
+                </div>
+                </div>
+              </div>
+            )}
+          </div>
+        )}
+      </div>
+    </div>
+  );
+};
+
+export default Terminal;
