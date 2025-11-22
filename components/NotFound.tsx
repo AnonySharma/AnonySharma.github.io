@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import { Home, RefreshCw, Terminal, Keyboard, Sparkles } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import { useAchievements } from '../contexts/AchievementContext';
 
 const excuses = [
   "It worked on my machine.",
@@ -28,6 +29,12 @@ const NotFound: React.FC = () => {
   const [glitchActive, setGlitchActive] = useState(false);
   const [showEasterEgg, setShowEasterEgg] = useState(false);
   const excuseRef = useRef<HTMLDivElement>(null);
+  const { unlockAchievement } = useAchievements();
+
+  // Track 404 visit for achievement
+  useEffect(() => {
+    localStorage.setItem('visited_404', 'true');
+  }, []);
 
   const handleNewExcuse = useCallback(() => {
     setExcuse((currentExcuse) => {
@@ -82,7 +89,11 @@ const NotFound: React.FC = () => {
       }
       if (konamiCode === konamiSequence) {
         setShowEasterEgg(true);
-        setTimeout(() => setShowEasterEgg(false), 3000);
+        localStorage.setItem('konami_unlocked', 'true');
+        localStorage.setItem('developer_mode', 'true');
+        unlockAchievement('konami_master');
+        unlockAchievement('developer_mode');
+        setTimeout(() => setShowEasterEgg(false), 5000);
         konamiCode = '';
       }
     };
@@ -113,13 +124,24 @@ const NotFound: React.FC = () => {
         </div>
       )}
 
-      {/* Easter Egg */}
+      {/* Easter Egg - Developer Mode */}
       {showEasterEgg && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm">
-          <div className="text-center animate-bounce">
-            <Sparkles size={64} className="text-yellow-400 mx-auto mb-4" />
-            <p className="text-2xl font-bold text-yellow-400">🎮 KONAMI CODE ACTIVATED!</p>
-            <p className="text-slate-400 mt-2">You found the secret!</p>
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/90 backdrop-blur-sm">
+          <div className="text-center max-w-md mx-auto p-8 bg-slate-900 border-2 border-primary rounded-xl animate-in zoom-in-95 fade-in">
+            <Sparkles size={64} className="text-yellow-400 mx-auto mb-4 animate-pulse" />
+            <p className="text-3xl font-bold text-yellow-400 mb-2">🎮 KONAMI CODE ACTIVATED!</p>
+            <p className="text-xl text-primary mb-4">Developer Mode Unlocked! 🍪</p>
+            <div className="text-left text-slate-300 space-y-2 mt-6 font-mono text-sm">
+              <div className="text-green-400">✓ Secret features enabled</div>
+              <div className="text-green-400">✓ Achievement system activated</div>
+              <div className="text-green-400">✓ All easter eggs unlocked</div>
+              <div className="text-green-400">✓ Developer console access granted</div>
+              <div className="text-green-400">✓ Hidden commands available</div>
+              <div className="text-slate-500 mt-4">Type 'help' in terminal for new commands</div>
+              <div className="text-slate-500">Try: 'devmode', 'eastereggs', 'sudo make-me-a-sandwich'</div>
+            </div>
+            <p className="text-slate-400 mt-6 text-sm">You found the secret! Here's a cookie: 🍪</p>
+            <p className="text-xs text-slate-500 mt-2">Developer mode persists across sessions</p>
           </div>
         </div>
       )}

@@ -1,8 +1,33 @@
-import React from 'react';
-import { ArrowRight, Github, Linkedin, Mail } from 'lucide-react';
+import React, { useState } from 'react';
+import { ArrowRight, Github, Linkedin, Mail, Download, FileText } from 'lucide-react';
 import { CONTACT_INFO } from '../constants';
 
 const Hero: React.FC = () => {
+  const [downloadCount, setDownloadCount] = useState(0);
+  const [showEasterEgg, setShowEasterEgg] = useState(false);
+
+  const handleResumeDownload = () => {
+    const count = downloadCount + 1;
+    setDownloadCount(count);
+    
+    // Track for achievement
+    const current = parseInt(localStorage.getItem('resume_downloads') || '0');
+    localStorage.setItem('resume_downloads', (current + 1).toString());
+    
+    if (count >= 3) {
+      setShowEasterEgg(true);
+      setTimeout(() => setShowEasterEgg(false), 5000);
+    }
+    
+    // Create a fake resume download
+    const link = document.createElement('a');
+    link.href = '#';
+    link.download = count >= 3 
+      ? 'Resume_Final_Final_v2_ACTUAL_FINAL_REALLY_FINAL.pdf' 
+      : 'Ankit_Kumar_Resume.pdf';
+    link.click();
+  };
+
   return (
     <section className="relative min-h-screen flex items-center justify-center pt-20 overflow-hidden">
       {/* Background Elements */}
@@ -31,10 +56,26 @@ const Hero: React.FC = () => {
             View Projects
             <ArrowRight className="ml-2 h-5 w-5" />
           </a>
+          <button
+            onClick={handleResumeDownload}
+            className="flex items-center justify-center px-8 py-3 rounded-full bg-gradient-to-r from-primary to-secondary text-white font-bold hover:from-indigo-600 hover:to-pink-600 transition-all transform hover:scale-105 shadow-lg shadow-primary/50"
+            title={downloadCount >= 3 ? "You really want my resume, don't you? 😄" : "Download Resume"}
+          >
+            <Download className="mr-2 h-5 w-5" />
+            Download Resume
+          </button>
           <a href="#contact" className="flex items-center justify-center px-8 py-3 rounded-full border border-slate-600 bg-slate-900/50 text-white hover:bg-slate-800 backdrop-blur-sm transition-all">
             Contact Me
           </a>
         </div>
+
+        {showEasterEgg && (
+          <div className="mt-4 p-4 bg-gradient-to-r from-primary/20 to-secondary/20 border border-primary/30 rounded-lg animate-pulse">
+            <p className="text-primary font-bold text-sm">
+              🎉 You really want my resume, don't you? Here's a special version with memes! (Just kidding, it's the same resume)
+            </p>
+          </div>
+        )}
 
         <div className="mt-12 flex gap-6 text-slate-400">
             <a href="https://github.com/AnonySharma" target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors" aria-label="GitHub Profile">

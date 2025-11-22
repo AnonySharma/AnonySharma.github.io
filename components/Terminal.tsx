@@ -11,13 +11,28 @@ import { useCommandLogic } from './terminal/hooks/useCommandLogic';
 
 interface TerminalProps {
   onClose: () => void;
+  onMinimize?: () => void;
+  isMinimized?: boolean;
 }
 
-const Terminal: React.FC<TerminalProps> = ({ onClose }) => {
+const Terminal: React.FC<TerminalProps> = ({ onClose, onMinimize, isMinimized = false }) => {
   // Phases: static (glitch) -> boot (logs) -> login (prompt) -> shell (interactive)
-  const [phase, setPhase] = useState<'static' | 'boot' | 'login' | 'shell'>('static');
+  const [phase, setPhase] = useState<'static' | 'boot' | 'login' | 'shell'>(() => {
+    // Check if terminal was previously booted (not closed)
+    const wasBooted = localStorage.getItem('terminal_booted') === 'true';
+    return wasBooted ? 'shell' : 'static';
+  });
   
-  const [lines, setLines] = useState<TerminalLine[]>([]);
+  const [lines, setLines] = useState<TerminalLine[]>(() => {
+    // Don't restore lines from localStorage - they contain React elements that can't be serialized
+    // Just show welcome message if terminal was previously booted
+    if (localStorage.getItem('terminal_booted') === 'true') {
+      return [
+        { type: 'system', content: <div className="opacity-70 mt-2 mb-2">Access Granted. Welcome to <span className="text-blue-400 font-bold">AnkitOS v2.4</span>. Type <span className="text-yellow-400 font-bold">help</span> for list of executables.</div> }
+      ];
+    }
+    return [];
+  });
   const [input, setInput] = useState('');
   const [cursorPos, setCursorPos] = useState(0);
   const [isMaximized, setIsMaximized] = useState(false);
@@ -44,7 +59,26 @@ const Terminal: React.FC<TerminalProps> = ({ onClose }) => {
 
   // Custom Hooks
   useMatrixEffect(canvasRef, matrixMode, isMaximized);
-  useBootSequence(phase, setPhase, setLines, scrollToBottom);
+  
+  // Check if terminal should boot (only if not previously booted)
+  const shouldBoot = !localStorage.getItem('terminal_booted') || localStorage.getItem('terminal_booted') !== 'true';
+  useBootSequence(phase, setPhase, setLines, scrollToBottom, shouldBoot);
+  
+  // Mark as booted when reaching shell phase
+  useEffect(() => {
+    if (phase === 'shell') {
+      localStorage.setItem('terminal_booted', 'true');
+    }
+  }, [phase]);
+  
+  // Don't save lines to localStorage - they contain React elements that can't be serialized
+  // The terminal state is preserved by the 'terminal_booted' flag
+  
+  // Handle close - reset boot state
+  const handleClose = () => {
+    localStorage.removeItem('terminal_booted');
+    onClose();
+  };
   
   const { 
     handleCommand, 
@@ -61,20 +95,29 @@ const Terminal: React.FC<TerminalProps> = ({ onClose }) => {
     fileSystem
   });
 
+  // Handle login actions (Enter/Esc or button clicks)
+  const handleLoginEnter = () => {
+    setPhase('shell');
+    // Clear logs and set the welcome message
+    setLines([
+        { type: 'system', content: <div className="opacity-70 mt-2 mb-2">Access Granted. Welcome to <span className="text-blue-400 font-bold">AnkitOS v2.4</span>. Type <span className="text-yellow-400 font-bold">help</span> for list of executables.</div> }
+    ]);
+    setCursorPos(0);
+  };
+
+  const handleLoginAbort = () => {
+    onClose();
+  };
+
   // --- Global Key Listener for Login Phase ---
   useEffect(() => {
       if (phase !== 'login') return;
 
       const handleGlobalKeyDown = (e: KeyboardEvent) => {
           if (e.key === 'Enter') {
-              setPhase('shell');
-              // Clear logs and set the welcome message
-              setLines([
-                  { type: 'system', content: <div className="opacity-70 mt-2 mb-2">Access Granted. Welcome to <span className="text-blue-400 font-bold">AnkitOS v2.4</span>. Type <span className="text-yellow-400 font-bold">help</span> for list of executables.</div> }
-              ]);
-              setCursorPos(0);
+              handleLoginEnter();
           } else if (e.key === 'Escape') {
-              onClose();
+              handleLoginAbort();
           }
       };
 
@@ -113,6 +156,7 @@ const Terminal: React.FC<TerminalProps> = ({ onClose }) => {
     }
 
     if (e.key === 'Enter') {
+      e.preventDefault();
       handleCommand(input);
       setInput('');
       setCursorPos(0);
@@ -128,12 +172,21 @@ const Terminal: React.FC<TerminalProps> = ({ onClose }) => {
     }
   };
 
+  // Handle command submission (for mobile submit button)
+  const handleSubmitCommand = () => {
+    if (input.trim()) {
+      handleCommand(input);
+      setInput('');
+      setCursorPos(0);
+    }
+  };
+
   // Styles
   const bgColor = matrixMode ? 'bg-black' : 'bg-[#1a1b26]';
   const textColor = matrixMode ? 'text-green-500' : 'text-[#a9b1d6]';
 
   // --- Static / Glitch Screen Render ---
-  if (phase === 'static') {
+  if (phase === 'static' && !isMinimized) {
       return (
           <div className="fixed inset-0 z-[100] bg-black flex items-center justify-center overflow-hidden">
               <div className="absolute inset-0 opacity-20 pointer-events-none" style={{
@@ -145,6 +198,22 @@ const Terminal: React.FC<TerminalProps> = ({ onClose }) => {
               <div className="absolute inset-0 bg-gradient-to-b from-transparent via-white/10 to-transparent h-[20px] w-full animate-[scan_2s_linear_infinite]"></div>
           </div>
       );
+  }
+
+  // Minimized state - show small restore button
+  if (isMinimized) {
+    return (
+      <div className="fixed bottom-6 right-6 z-[100]">
+        <button
+          onClick={onMinimize}
+          className="bg-[#1a1b26] border border-[#414868] rounded-lg px-4 py-2 text-sm text-[#a9b1d6] hover:bg-[#24283b] transition-colors flex items-center gap-2 shadow-lg"
+          title="Restore Terminal"
+        >
+          <div className="w-2 h-2 rounded-full bg-green-500"></div>
+          <span>Terminal</span>
+        </button>
+      </div>
+    );
   }
 
   return (
@@ -172,7 +241,8 @@ const Terminal: React.FC<TerminalProps> = ({ onClose }) => {
       }}></div>
 
       <TopBar 
-        onClose={onClose} 
+        onClose={handleClose} 
+        onMinimize={onMinimize}
         isMaximized={isMaximized} 
         setIsMaximized={setIsMaximized} 
         phase={phase} 
@@ -215,10 +285,33 @@ const Terminal: React.FC<TerminalProps> = ({ onClose }) => {
 
         {/* Login Prompt */}
         {phase === 'login' && (
-            <div className="mt-12 flex flex-col items-center justify-center h-32 animate-pulse">
-                <div className="text-green-400 font-bold text-xl mb-2">SYSTEM READY</div>
-                <div className="text-slate-400">PRESS <span className="bg-slate-700 text-white px-1 rounded text-xs">ENTER</span> TO INITIALIZE SHELL</div>
-                <div className="text-slate-600 text-xs mt-4">PRESS <span className="bg-slate-800 px-1 rounded">ESC</span> TO ABORT</div>
+            <div className="mt-12 flex flex-col items-center justify-center h-32">
+                <div className="text-green-400 font-bold text-xl mb-4">SYSTEM READY</div>
+                <div className="text-slate-400 mb-2 text-center">
+                  PRESS <span className="bg-slate-700 text-white px-1 rounded text-xs">ENTER</span> TO INITIALIZE SHELL
+                </div>
+                <div className="text-slate-600 text-xs mb-6 text-center">
+                  PRESS <span className="bg-slate-800 px-1 rounded">ESC</span> TO ABORT
+                </div>
+                {/* Mobile-friendly buttons */}
+                <div className="flex flex-col sm:hidden gap-3 w-full max-w-xs px-4">
+                  <button
+                    onClick={handleLoginEnter}
+                    className="bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-6 rounded-lg transition-colors active:scale-95"
+                  >
+                    INITIALIZE SHELL
+                  </button>
+                  <button
+                    onClick={handleLoginAbort}
+                    className="bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-6 rounded-lg transition-colors active:scale-95 text-sm"
+                  >
+                    ABORT
+                  </button>
+                </div>
+                {/* Desktop hint - hidden on mobile */}
+                <div className="hidden sm:block text-slate-600 text-xs mt-4">
+                  (Use keyboard on desktop)
+                </div>
             </div>
         )}
 
@@ -228,7 +321,7 @@ const Terminal: React.FC<TerminalProps> = ({ onClose }) => {
             {activeComponent ? (
                 <div className="mb-2">{activeComponent}</div>
             ) : (
-              <div className="flex items-center">
+              <div className="flex items-center gap-2">
                 <div className="flex-shrink-0">
                     <Prompt path={currentPath} matrixMode={matrixMode} />
                 </div>
@@ -249,6 +342,9 @@ const Terminal: React.FC<TerminalProps> = ({ onClose }) => {
                     autoFocus
                     spellCheck={false}
                     autoComplete="off"
+                    autoCapitalize="off"
+                    autoCorrect="off"
+                    inputMode="text"
                 />
                 {/* Custom Block Cursor Overlay */}
                 <div className={`absolute pointer-events-none left-0 top-0 h-full flex items-center whitespace-pre font-mono text-sm sm:text-base ${matrixMode ? 'text-green-500' : 'text-slate-200'}`}>
@@ -256,6 +352,15 @@ const Terminal: React.FC<TerminalProps> = ({ onClose }) => {
                      <span className={`block w-[1ch] h-[1.2em] -mb-[0.15em] ${matrixMode ? 'bg-green-500' : 'bg-slate-400'} animate-pulse opacity-70`}></span>
                 </div>
                 </div>
+                {/* Mobile submit button */}
+                <button
+                  onClick={handleSubmitCommand}
+                  disabled={!input.trim()}
+                  className="sm:hidden bg-primary hover:bg-indigo-600 disabled:bg-slate-700 disabled:opacity-50 text-white font-bold py-2 px-4 rounded transition-colors active:scale-95"
+                  title="Submit command"
+                >
+                  →
+                </button>
               </div>
             )}
           </div>

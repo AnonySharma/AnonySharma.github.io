@@ -1,10 +1,79 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { TerminalLine, FSNode } from '../TerminalTypes';
 import { SysInfoOutput, NeofetchOutput, PsOutput, TopProcess, DockerPsOutput, DockerImagesOutput, DockerRunOutput } from '../commands/SystemCommands';
 import { PingProcess } from '../commands/NetworkCommands';
 import { CowsayOutput, MatrixProcess, SteamLocomotive, CryptoMiner, TypeGame, SingPlayer, FortuneOutput, FireEffect, CoffeeOutput, HackProcess, SnakeGame, PartyParrot } from '../commands/FunCommands';
 import { SyntaxHighlighter } from '../SyntaxHighlighter';
+import { SKILLS } from '../../../constants';
+
+// DevMode Status Component with Toggle
+const DevModeStatus: React.FC<{ 
+    isDevMode: boolean; 
+    found: Array<{ key: string; name: string }>; 
+    easterEggs: Array<{ key: string; name: string }> 
+}> = ({ isDevMode, found, easterEggs }) => {
+    const [achievementsUnlocked, setAchievementsUnlocked] = useState(() => {
+        return localStorage.getItem('achievements_unlocked') === 'true';
+    });
+
+    useEffect(() => {
+        // Check for changes in localStorage (in case unlocked from another tab/component)
+        const checkUnlock = () => {
+            const unlocked = localStorage.getItem('achievements_unlocked') === 'true';
+            setAchievementsUnlocked(unlocked);
+        };
+        const interval = setInterval(checkUnlock, 500);
+        return () => clearInterval(interval);
+    }, []);
+
+    const handleToggle = () => {
+        if (!achievementsUnlocked) {
+            localStorage.setItem('achievements_unlocked', 'true');
+            setAchievementsUnlocked(true);
+            // Trigger a custom event to notify Achievements component
+            window.dispatchEvent(new Event('achievementsUnlocked'));
+        }
+    };
+
+    return (
+        <div className="font-mono text-sm space-y-2">
+            <div className="text-green-400 font-bold">Developer Mode Status:</div>
+            <div className={isDevMode ? 'text-green-400' : 'text-red-400'}>
+                {isDevMode ? '✓ ACTIVE' : '✗ INACTIVE'}
+            </div>
+            <div className="text-cyan-400 font-bold mt-4">Easter Eggs Found: {found.length}/{easterEggs.length}</div>
+            <div className="text-slate-400 text-xs space-y-1">
+                {found.map((egg, idx) => (
+                    <div key={idx} className="text-green-400">✓ {egg.name}</div>
+                ))}
+                {easterEggs.filter(egg => !found.some(f => f.key === egg.key)).map((egg, idx) => (
+                    <div key={idx} className="text-slate-600">✗ {egg.name}</div>
+                ))}
+            </div>
+            {!isDevMode && (
+                <div className="text-yellow-400 text-xs mt-2">💡 Tip: Try the Konami code to unlock developer mode!</div>
+            )}
+            <div className="text-cyan-400 font-bold mt-4">Achievements Panel:</div>
+            <div className="flex items-center gap-3">
+                <div className={achievementsUnlocked ? 'text-green-400' : 'text-red-400'}>
+                    {achievementsUnlocked ? '✓ UNLOCKED' : '✗ LOCKED'}
+                </div>
+                {!achievementsUnlocked && (
+                    <button
+                        onClick={handleToggle}
+                        className="px-3 py-1 bg-primary hover:bg-indigo-600 text-white text-xs font-bold rounded transition-colors border border-primary/50 hover:border-primary"
+                    >
+                        [UNLOCK]
+                    </button>
+                )}
+            </div>
+            {achievementsUnlocked && (
+                <div className="text-green-400 text-xs mt-1">The achievements button is now visible in the bottom-left corner.</div>
+            )}
+        </div>
+    );
+};
 
 interface CommandLogicProps {
     lines: TerminalLine[];
@@ -108,7 +177,7 @@ export const useCommandLogic = ({
             'cowsay', 'whoami', 'pwd', 'exit', 'sudo', 'rm', 'vim', 'vi', 
             'nano', 'emacs', 'weather', 'coinflip', 'hack', 'coffee', 'brew', 
             'joke', '42', 'eastereggs', 'whois', 'fortune', 'fire', 'docker', 
-            'game', 'party', 'bsod'
+            'game', 'party', 'bsod', 'skills', 'resume', 'devmode', 'developer'
         ];
 
         const args = input.split(' ');
@@ -198,6 +267,15 @@ export const useCommandLogic = ({
         setHistoryIndex(-1);
 
         const [cmd, ...args] = cmdTrimmed.split(/\s+/);
+        
+        // Track command usage for achievements
+        const usedCommands = JSON.parse(localStorage.getItem('used_commands') || '[]');
+        if (!usedCommands.includes(cmd.toLowerCase())) {
+            usedCommands.push(cmd.toLowerCase());
+            localStorage.setItem('used_commands', JSON.stringify(usedCommands));
+            const count = parseInt(localStorage.getItem('terminal_commands_used') || '0');
+            localStorage.setItem('terminal_commands_used', (count + 1).toString());
+        }
         const promptLine: TerminalLine = { type: 'input', content: rawInput };
         const newLines: TerminalLine[] = [promptLine];
 
@@ -224,6 +302,10 @@ export const useCommandLogic = ({
                                 <div className="flex"><span className="w-24 text-yellow-400 font-bold">fire</span> <span>Burn the terminal</span></div>
                                 <div className="flex"><span className="w-24 text-yellow-400 font-bold">game</span> <span>Play Snake</span></div>
                                 <div className="flex"><span className="w-24 text-yellow-400 font-bold">hack</span> <span>Simulate a hack</span></div>
+                                <div className="flex"><span className="w-24 text-yellow-400 font-bold">skills</span> <span>Show skills (--graph, --level)</span></div>
+                                <div className="flex"><span className="w-24 text-yellow-400 font-bold">resume</span> <span>Display resume in terminal</span></div>
+                                <div className="flex"><span className="w-24 text-yellow-400 font-bold">devmode</span> <span>Show developer mode status (unlock achievements)</span></div>
+                                <div className="flex"><span className="w-24 text-yellow-400 font-bold">eastereggs</span> <span>List all easter eggs</span></div>
                             </div>
                         )
                     });
@@ -238,10 +320,12 @@ export const useCommandLogic = ({
                     break;
 
                 case 'cowsay':
+                    localStorage.setItem('cowsay_used', 'true');
                     newLines.push({ type: 'output', content: <CowsayOutput args={args} /> });
                     break;
 
                 case 'fortune':
+                    localStorage.setItem('fortune_used', 'true');
                     newLines.push({ type: 'output', content: <FortuneOutput /> });
                     break;
 
@@ -275,6 +359,7 @@ export const useCommandLogic = ({
                     break;
 
                 case 'type':
+                    localStorage.setItem('typing_test', 'true');
                     setActiveComponent(<TypeGame onExit={(score) => {
                         setActiveComponent(null);
                         if (score) {
@@ -284,10 +369,12 @@ export const useCommandLogic = ({
                     break;
 
                 case 'fire':
+                    localStorage.setItem('fire_used', 'true');
                     setActiveComponent(<FireEffect onExit={() => setActiveComponent(null)} scrollToBottom={scrollToBottom} />);
                     break;
 
                 case 'docker':
+                    localStorage.setItem('docker_used', 'true');
                     if (args.length === 0) {
                         newLines.push({ type: 'output', content: <span className="text-slate-400">Usage: docker [ps | images | run &lt;image&gt;]</span> });
                     } else {
@@ -408,6 +495,119 @@ export const useCommandLogic = ({
                     newLines.push({ type: 'output', content: 'visitor' });
                     break;
 
+                case 'skills':
+                    // Skill level mapping (for consistent display)
+                    const skillLevels: { [key: string]: number } = {
+                        "C++": 90,
+                        "JavaScript": 85,
+                        "HTML": 80,
+                        "Spring Boot": 75,
+                        "Flutter": 70,
+                        "AWS": 65,
+                        "Material UI": 60,
+                        "Data Structures": 95,
+                        "Algorithms": 95,
+                        "Competitive Programming": 90
+                    };
+
+                    if (args[0] === '--graph' || args[0] === '-g') {
+                        const maxLength = Math.max(...SKILLS.map(s => s.length));
+                        newLines.push({
+                            type: 'output',
+                            content: (
+                                <div className="font-mono text-sm space-y-1">
+                                    <div className="text-green-400 mb-2">Skills Proficiency Graph:</div>
+                                    {SKILLS.map((skill, idx) => {
+                                        const level = skillLevels[skill] || 70;
+                                        const barLength = Math.floor(level / 5);
+                                        const bar = '█'.repeat(barLength) + '░'.repeat(20 - barLength);
+                                        return (
+                                            <div key={idx} className="flex items-center gap-2">
+                                                <span className="text-cyan-400 w-32">{skill.padEnd(maxLength)}</span>
+                                                <span className="text-yellow-400">{bar}</span>
+                                                <span className="text-green-400">{level}%</span>
+                                            </div>
+                                        );
+                                    })}
+                                    <div className="text-slate-500 text-xs mt-2">Note: These percentages are completely made up. But I'm good at them! 😎</div>
+                                </div>
+                            )
+                        });
+                    } else if (args[0] === '--level' || args[0] === '-l') {
+                        const maxLength = Math.max(...SKILLS.map(s => s.length));
+                        newLines.push({
+                            type: 'output',
+                            content: (
+                                <div className="font-mono text-sm space-y-1">
+                                    <div className="text-green-400 mb-2">Skills with Proficiency Levels:</div>
+                                    {SKILLS.map((skill, idx) => {
+                                        const level = skillLevels[skill] || 70;
+                                        const levelText = level >= 90 ? 'Expert' : level >= 75 ? 'Advanced' : level >= 60 ? 'Intermediate' : 'Beginner';
+                                        const levelColor = level >= 90 ? 'text-green-400' : level >= 75 ? 'text-yellow-400' : level >= 60 ? 'text-cyan-400' : 'text-slate-400';
+                                        return (
+                                            <div key={idx} className="flex items-center gap-2">
+                                                <span className="text-cyan-400 w-40">{skill.padEnd(maxLength)}</span>
+                                                <span className={`${levelColor} font-bold`}>{levelText}</span>
+                                                <span className="text-slate-500">({level}%)</span>
+                                            </div>
+                                        );
+                                    })}
+                                    <div className="text-slate-500 text-xs mt-2">Use 'skills --graph' for a visual bar representation</div>
+                                </div>
+                            )
+                        });
+                    } else {
+                        newLines.push({
+                            type: 'output',
+                            content: (
+                                <div className="font-mono text-sm">
+                                    <div className="text-green-400 mb-2">Available Skills:</div>
+                                    <div className="text-cyan-400">{SKILLS.join(', ')}</div>
+                                    <div className="text-slate-500 text-xs mt-2">Use 'skills --graph' for a visual representation</div>
+                                    <div className="text-slate-500 text-xs">Use 'skills --level' to see proficiency levels</div>
+                                </div>
+                            )
+                        });
+                    }
+                    break;
+
+                case 'resume':
+                    newLines.push({
+                        type: 'output',
+                        content: (
+                            <div className="font-mono text-sm space-y-2">
+                                <div className="text-green-400">═══════════════════════════════════════════════════════</div>
+                                <div className="text-white font-bold text-lg">ANKIT KUMAR</div>
+                                <div className="text-cyan-400">Member of Technical Staff @ Salesforce</div>
+                                <div className="text-slate-400">═══════════════════════════════════════════════════════</div>
+                                
+                                <div className="text-yellow-400 mt-4 font-bold">EDUCATION</div>
+                                <div className="text-white">IIT (BHU) Varanasi - B.Tech CSE (2019-2023)</div>
+                                <div className="text-slate-400">Rank 61 - ICPC Regionals</div>
+                                
+                                <div className="text-yellow-400 mt-4 font-bold">EXPERIENCE</div>
+                                <div className="text-white">Member of Technical Staff @ Salesforce (Aug 2025 - Present)</div>
+                                <div className="text-slate-400">  • Working with cutting-edge enterprise cloud solutions</div>
+                                <div className="text-white">Associate MTS @ Salesforce (June 2023 - Aug 2025)</div>
+                                <div className="text-slate-400">  • Contributed to core platform development</div>
+                                <div className="text-white">Full Stack Developer @ Scapia (Dec 2022 - April 2023)</div>
+                                <div className="text-slate-400">  • Travel-Now-Pay-Later vertical (Spring Boot + Flutter)</div>
+                                
+                                <div className="text-yellow-400 mt-4 font-bold">SKILLS</div>
+                                <div className="text-cyan-400">C++, JavaScript, HTML, Spring Boot, Flutter, AWS, Material UI</div>
+                                
+                                <div className="text-yellow-400 mt-4 font-bold">CONTACT</div>
+                                <div className="text-white">Email: cgankitsharma@gmail.com</div>
+                                <div className="text-white">LinkedIn: linkedin.com/in/cgankitsharma</div>
+                                <div className="text-white">GitHub: github.com/AnonySharma</div>
+                                
+                                <div className="text-green-400 mt-4">═══════════════════════════════════════════════════════</div>
+                                <div className="text-slate-500 text-xs">Type 'download resume' or click the download button for PDF version</div>
+                            </div>
+                        )
+                    });
+                    break;
+
                 case 'clear':
                     setLines([]);
                     return;
@@ -417,6 +617,57 @@ export const useCommandLogic = ({
                     return;
 
                 // --- Easter Eggs ---
+                case 'devmode':
+                case 'developer':
+                    // Check if unlock subcommand
+                    if (args[0] === 'unlock' && args[1] === 'achievements') {
+                        localStorage.setItem('achievements_unlocked', 'true');
+                        newLines.push({
+                            type: 'output',
+                            content: (
+                                <div className="font-mono text-sm space-y-2">
+                                    <div className="text-green-400 font-bold">✓ Achievements panel unlocked!</div>
+                                    <div className="text-slate-400 text-xs">The achievements button is now visible in the bottom-left corner.</div>
+                                    <div className="text-slate-400 text-xs">This will persist across future visits.</div>
+                                </div>
+                            )
+                        });
+                        break;
+                    }
+                    
+                    // Default devmode status display
+                    const isDevMode = localStorage.getItem('developer_mode') === 'true';
+                    const easterEggs = [
+                        { key: 'konami_unlocked', name: 'Konami Code' },
+                        { key: 'logo_clicked_10', name: 'Logo Clicker (10x)' },
+                        { key: 'sudo_sandwich', name: 'Sudo Sandwich' },
+                        { key: 'hack_attempted', name: 'Hack Command' },
+                        { key: 'fortune_used', name: 'Fortune' },
+                        { key: 'coffee_used', name: 'Coffee/Brew' },
+                        { key: 'joke_used', name: 'Joke' },
+                        { key: 'answer_42', name: 'Answer 42' },
+                        { key: 'whois_used', name: 'Whois' },
+                        { key: 'docker_used', name: 'Docker' },
+                        { key: 'snake_played', name: 'Snake Game' },
+                        { key: 'party_started', name: 'Party' },
+                        { key: 'fire_used', name: 'Fire' },
+                        { key: 'typing_test', name: 'Typing Test' },
+                        { key: 'cowsay_used', name: 'Cowsay' },
+                        { key: 'bsod_triggered', name: 'BSOD' }
+                    ];
+                    const found = easterEggs.filter(egg => localStorage.getItem(egg.key) === 'true');
+                    newLines.push({
+                        type: 'output',
+                        content: (
+                            <DevModeStatus 
+                                isDevMode={isDevMode}
+                                found={found}
+                                easterEggs={easterEggs}
+                            />
+                        )
+                    });
+                    break;
+
                 case 'eastereggs':
                     newLines.push({
                         type: 'output', content: (
@@ -452,14 +703,17 @@ export const useCommandLogic = ({
                     break;
 
                 case 'bsod':
+                    localStorage.setItem('bsod_triggered', 'true');
                     setBsodTriggered(true);
                     return;
 
                 case 'sudo':
                     if (args.join(' ').includes('rm -rf /')) {
+                        localStorage.setItem('bsod_triggered', 'true');
                         setBsodTriggered(true);
                         return;
                     } else if (args.join(' ').includes('make-me-a-sandwich')) {
+                        localStorage.setItem('sudo_sandwich', 'true');
                         newLines.push({ type: 'output', content: <span className="text-green-400">Okay. 🥪</span> });
                     } else {
                         newLines.push({ type: 'output', content: <span className="text-red-400 font-bold">Permission denied: You are not in the sudoers file. This incident will be reported.</span> });
@@ -467,6 +721,7 @@ export const useCommandLogic = ({
                     break;
 
                 case 'matrix':
+                    localStorage.setItem('matrix_activated', 'true');
                     setActiveComponent(<MatrixProcess setMatrixMode={setMatrixMode} onExit={() => setActiveComponent(null)} />);
                     break;
 
@@ -480,6 +735,7 @@ export const useCommandLogic = ({
 
                 case 'rm':
                     if (args.includes('-rf') && (args.includes('/') || args.includes('*'))) {
+                        localStorage.setItem('bsod_triggered', 'true');
                         setBsodTriggered(true);
                         return;
                     } else {
@@ -504,10 +760,12 @@ export const useCommandLogic = ({
                     break;
 
                 case 'hack':
+                    localStorage.setItem('hack_attempted', 'true');
                     setActiveComponent(<HackProcess onExit={() => setActiveComponent(null)} scrollToBottom={scrollToBottom} />);
                     break;
 
                 case 'game':
+                    localStorage.setItem('snake_played', 'true');
                     setActiveComponent(<SnakeGame onExit={(score) => {
                         setActiveComponent(null);
                         setLines(prev => [...prev, { type: 'output', content: <span className="text-green-400">Game Over! Score: {score}</span> }]);
@@ -515,6 +773,7 @@ export const useCommandLogic = ({
                     break;
 
                 case 'party':
+                    localStorage.setItem('party_started', 'true');
                     setActiveComponent(<PartyParrot onExit={() => setActiveComponent(null)} />);
                     break;
 
@@ -527,6 +786,7 @@ export const useCommandLogic = ({
 
                 case 'coffee':
                 case 'brew':
+                    localStorage.setItem('coffee_used', 'true');
                     newLines.push({ type: 'output', content: <CoffeeOutput /> });
                     break;
 
@@ -542,10 +802,12 @@ export const useCommandLogic = ({
                     break;
 
                 case '42':
+                    localStorage.setItem('answer_42', 'true');
                     newLines.push({ type: 'output', content: <span className="text-green-400">The Answer to the Ultimate Question of Life, the Universe, and Everything.</span> });
                     break;
 
                 case 'whois':
+                    localStorage.setItem('whois_used', 'true');
                     const subArg = args[0]?.toLowerCase();
                     if (!subArg || subArg === 'ankit') {
                         newLines.push({

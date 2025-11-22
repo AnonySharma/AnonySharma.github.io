@@ -7,25 +7,27 @@ export const useBootSequence = (
   phase: 'static' | 'boot' | 'login' | 'shell',
   setPhase: (p: 'static' | 'boot' | 'login' | 'shell') => void,
   setLines: React.Dispatch<React.SetStateAction<TerminalLine[]>>,
-  scrollToBottom: () => void
+  scrollToBottom: () => void,
+  shouldBoot: boolean = true
 ) => {
   const hasBooted = useRef(false);
     
   // --- Initial Glitch / Static Phase ---
   useEffect(() => {
-    if (phase === 'static') {
+    if (phase === 'static' && shouldBoot) {
         hasBooted.current = false;
         const timer = setTimeout(() => {
             setPhase('boot');
         }, 1200); 
         return () => clearTimeout(timer);
     }
-  }, [phase, setPhase]);
+  }, [phase, setPhase, shouldBoot]);
 
   // --- Boot Sequence ---
   useEffect(() => {
     if (phase !== 'boot') return;
     if (hasBooted.current) return;
+    if (!shouldBoot) return; // Skip boot if terminal was already booted
     hasBooted.current = true;
 
     const bootMessages = [
@@ -99,5 +101,5 @@ export const useBootSequence = (
     };
 
     runBootSequence();
-  }, [phase, setLines, setPhase, scrollToBottom]);
+  }, [phase, setLines, setPhase, scrollToBottom, shouldBoot]);
 };

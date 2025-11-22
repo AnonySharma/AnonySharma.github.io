@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Menu, X } from 'lucide-react';
+import { useAchievements } from '../contexts/AchievementContext';
 
 interface NavbarProps {
   onOpenTerminal: () => void;
@@ -8,6 +9,9 @@ interface NavbarProps {
 const Navbar: React.FC<NavbarProps> = ({ onOpenTerminal }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
+  const [logoClickCount, setLogoClickCount] = useState(0);
+  const [showEasterEgg, setShowEasterEgg] = useState(false);
+  const { unlockAchievement } = useAchievements();
 
   useEffect(() => {
     const handleScroll = () => setScrolled(window.scrollY > 50);
@@ -15,11 +19,45 @@ const Navbar: React.FC<NavbarProps> = ({ onOpenTerminal }) => {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
+  const handleLogoClick = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    
+    const newCount = logoClickCount + 1;
+    setLogoClickCount(newCount);
+    
+    if (newCount === 5) {
+      localStorage.setItem('logo_clicked_5', 'true');
+      unlockAchievement('logo_clicker');
+      setShowEasterEgg(true);
+      setTimeout(() => setShowEasterEgg(false), 3000);
+    } else if (newCount === 10) {
+      localStorage.setItem('logo_clicked_10', 'true');
+      unlockAchievement('logo_obsessed');
+      setShowEasterEgg(true);
+      setTimeout(() => setShowEasterEgg(false), 3000);
+    }
+    
+    // Reset after 3 seconds if not clicking
+    setTimeout(() => {
+      setLogoClickCount(prev => {
+        if (prev === newCount) {
+          return 0;
+        }
+        return prev;
+      });
+    }, 2000);
+    
+    // Always open terminal
+    onOpenTerminal();
+  };
+
   const navLinks = [
     { name: 'About', href: '#about' },
     { name: 'Skills', href: '#skills' },
-    { name: 'Experience', href: '#experience' },
     { name: 'Projects', href: '#projects' },
+    { name: 'Code', href: '#code-snippets' },
+    { name: 'Testimonials', href: '#testimonials' },
     { name: 'Contact', href: '#contact' },
   ];
 
@@ -28,8 +66,9 @@ const Navbar: React.FC<NavbarProps> = ({ onOpenTerminal }) => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center">
           <button 
-            onClick={onOpenTerminal}
-            className="flex items-center space-x-2 group focus:outline-none"
+            type="button"
+            onClick={handleLogoClick}
+            className="flex items-center space-x-2 group focus:outline-none cursor-pointer"
             title="Enter Terminal Mode"
           >
             <div className="bg-gradient-to-r from-primary to-secondary p-2 rounded-lg group-hover:from-green-600 group-hover:to-green-400 transition-all duration-500">
@@ -37,6 +76,12 @@ const Navbar: React.FC<NavbarProps> = ({ onOpenTerminal }) => {
             </div>
             <span className="text-xl font-bold hidden sm:block group-hover:text-green-400 transition-colors">Ankit Kumar</span>
           </button>
+          
+          {showEasterEgg && (
+            <div className="fixed top-20 left-1/2 transform -translate-x-1/2 z-50 bg-yellow-400 text-black px-4 py-2 rounded-lg shadow-lg animate-bounce">
+              {logoClickCount === 5 ? "🎉 You really like clicking things!" : "🤯 Are you okay? That's a lot of clicks!"}
+            </div>
+          )}
 
           {/* Desktop Menu */}
           <div className="hidden md:flex space-x-8">
