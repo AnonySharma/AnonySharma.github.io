@@ -332,9 +332,16 @@ export const useCommandLogic = ({
                     break;
 
                 case 'ls':
+                    const showHidden = args.includes('-a') || args.includes('--all');
                     const node = getNodeAt(currentPath);
                     if (node && node.type === 'dir') {
-                        const children = Object.entries(node.children);
+                        const children = Object.entries(node.children)
+                            .filter(([name]) => showHidden || !name.startsWith('.'));
+                        
+                        if (children.length === 0 && !showHidden) {
+                             // If all files are hidden and no -a, maybe show nothing or just empty
+                        }
+
                         const content = (
                             <div className="flex flex-wrap gap-x-6 gap-y-2">
                                 {children.map(([name, child]) => (
@@ -346,6 +353,22 @@ export const useCommandLogic = ({
                         );
                         newLines.push({ type: 'output', content });
                     }
+                    break;
+
+                case 'reboot':
+                    newLines.push({ type: 'output', content: <span className="text-yellow-400">System reboot initiated...</span> });
+                    setTimeout(() => {
+                        localStorage.removeItem('terminal_booted');
+                        window.location.reload();
+                    }, 1000);
+                    break;
+
+                case 'date':
+                    newLines.push({ type: 'output', content: <span className="text-slate-300">{new Date().toString()}</span> });
+                    break;
+
+                case 'who':
+                    newLines.push({ type: 'output', content: <span className="text-slate-300">visitor  pts/0  {new Date().toLocaleTimeString()} ({navigator.userAgent.includes('Mac') ? 'Mac' : 'PC'})</span> });
                     break;
 
                 case 'cd':
@@ -879,6 +902,58 @@ export const useCommandLogic = ({
                         });
                     } else {
                         newLines.push({ type: 'output', content: <span className="text-slate-400">Unknown user or entity: {subArg}. Try 'ankit', 'salesforce', or 'cse'.</span> });
+                    }
+                    break;
+
+                case 'stonks':
+                    const isUp = Math.random() > 0.5;
+                    const stonkChartUp = `
+        ▲  
+        |      /\\  
+        |   /\\/  \\    /\\
+    70$ |  /      \\  /  \\      /
+        | /        \\/    \\    /
+        |/                \\  /
+    10$ |                  \\/
+        +---------------------------->
+    `;
+                    const stonkChartDown = `
+    70$ +--\\
+        |   \\      /\\
+        |    \\    /  \\    /
+        |     \\/\\/    \\  /
+    10$ |              \\/
+        |                  
+        +---------------------------->
+    `;
+                    if (isUp) {
+                        newLines.push({ type: 'output', content: <pre className="text-green-400 font-mono whitespace-pre">{stonkChartUp} <br/>Crypto portfolio: +10000% 🚀 (To the moon!)</pre> });
+                    } else {
+                        newLines.push({ type: 'output', content: <pre className="text-red-400 font-mono whitespace-pre">{stonkChartDown} <br/>Crypto portfolio: -99.9% 📉 (Buy the dip?)</pre> });
+                    }
+                    break;
+
+                case 'yeet':
+                    // Select terminal by ID
+                    const terminalElement = document.getElementById('terminal-container');
+                    if (terminalElement) {
+                        terminalElement.classList.add('yeet-animation');
+                        setTimeout(() => {
+                            terminalElement.classList.remove('yeet-animation');
+                            setLines([]); // Clear history after yeet
+                        }, 1000);
+                    }
+                    newLines.push({ type: 'output', content: <span className="text-yellow-400">YEET! 👋</span> });
+                    break;
+
+                case 'touch':
+                    if (args.join(' ') === 'grass') {
+                        newLines.push({ type: 'output', content: <span className="text-green-500">System overheating. User needs sunlight. Opening maps...</span> });
+                        setTimeout(() => {
+                            window.open('https://www.google.com/maps/search/parks+near+me', '_blank');
+                        }, 1500);
+                    } else {
+                        newLines.push({ type: 'output', content: <span className="text-pink-400">Hey! Don't touch me! 😡</span> });
                     }
                     break;
 

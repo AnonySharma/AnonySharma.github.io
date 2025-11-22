@@ -129,6 +129,23 @@ LOCATION: ${CONTACT_INFO.location}
 
 Use 'open contact' to visit LinkedIn.`
                         },
+                        '.env': {
+                            type: 'file',
+                            content: `API_KEY=hunter2
+SECRET_SAUCE=love
+MEANING_OF_LIFE=42
+KONAMI_CODE=UP,UP,DOWN,DOWN,LEFT,RIGHT,LEFT,RIGHT,B,A
+`
+                        },
+                        'todo.md': {
+                            type: 'file',
+                            content: `- [x] Build the coolest portfolio ever
+- [x] Add easter eggs
+- [ ] Take over the world (pending)
+- [ ] Drink more coffee
+- [ ] Fix that one bug in line 42
+`
+                        },
                         'resume.pdf': {
                             type: 'file',
                             isBinary: true,

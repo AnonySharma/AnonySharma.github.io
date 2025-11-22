@@ -304,6 +304,7 @@ const Terminal: React.FC<TerminalProps> = ({ onClose, onMinimize, isMinimized = 
 
   return (
     <div 
+      id="terminal-container"
       className={`fixed z-[100] ${bgColor} ${textColor} font-mono p-4 sm:p-8 overflow-hidden flex flex-col ${animationClass} ${isMaximized ? 'inset-0' : 'inset-0'}`}
       onClick={(e) => {
         // Only focus input if click is directly on the terminal container or void space

@@ -1,0 +1,142 @@
+
+/* Yeet Animation */
+@keyframes yeet {
+  0% {
+    transform: rotate(0deg) translate(0, 0);
+    opacity: 1;
+  }
+  20% {
+    transform: rotate(-10deg) translate(-20px, 10px);
+  }
+  100% {
+    transform: rotate(120deg) translate(100vw, -100vh);
+    opacity: 0;
+  }
+}
+
+.yeet-animation {
+  animation: yeet 1s ease-in forwards;
+  pointer-events: none;
+}
+
+/* Terminal-specific scrollbar */
+.custom-scrollbar::-webkit-scrollbar {
+  width: 8px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: rgba(15, 23, 42, 0.5);
+  border-radius: 4px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: rgba(51, 65, 85, 0.8);
+  border-radius: 4px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: rgba(71, 85, 105, 0.9);
+}
+
+/* Terminal minimize/maximize animations */
+@keyframes minimizeTerminal {
+  0% {
+    transform: scale(1);
+    opacity: 1;
+    border-radius: 0;
+  }
+  50% {
+    opacity: 0.8;
+  }
+  100% {
+    transform: scale(0.08);
+    opacity: 0;
+    border-radius: 8px;
+  }
+}
+
+@keyframes maximizeTerminal {
+  0% {
+    transform: scale(0.08);
+    opacity: 0;
+    border-radius: 8px;
+  }
+  50% {
+    opacity: 0.8;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+    border-radius: 0;
+  }
+}
+
+@keyframes minimizeButtonAppear {
+  0% {
+    transform: scale(0);
+    opacity: 0;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+@keyframes minimizeButtonPulse {
+  0%, 100% {
+    box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.7);
+  }
+  50% {
+    box-shadow: 0 0 0 8px rgba(34, 197, 94, 0);
+  }
+}
+
+.terminal-minimizing {
+  animation: minimizeTerminal 0.4s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+  pointer-events: none;
+}
+
+.terminal-maximizing {
+  animation: maximizeTerminal 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+}
+
+.minimize-button-appear {
+  animation: minimizeButtonAppear 0.3s cubic-bezier(0.4, 0, 0.2, 1) 0.2s both;
+}
+
+.minimize-button-pulse {
+  animation: minimizeButtonPulse 2s ease-in-out infinite;
+}
+
+/* Glitch effect */
+@keyframes glitch {
+  0%, 100% { 
+    transform: translate(0); 
+  }
+  20% { 
+    transform: translate(-2px, 2px); 
+  }
+  40% { 
+    transform: translate(-2px, -2px); 
+  }
+  60% { 
+    transform: translate(2px, 2px); 
+  }
+  80% { 
+    transform: translate(2px, -2px); 
+  }
+}
+
+.glitch-text {
+  animation: glitch 1s infinite;
+}
+
+/* Scanline effect */
+@keyframes scan {
+  0% {
+    background-position: 0 -100vh;
+  }
+  100% {
+    background-position: 0 100vh;
+  }
+}
