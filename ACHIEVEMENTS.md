@@ -22,6 +22,7 @@ Spoilers ahead! This guide reveals how to unlock every single achievement in the
 | **Logo Obsessed** | 👆 | Click the "AK" logo 10 times. |
 | **Social Butterfly** | 🦋 | Click on all social media links (GitHub, LinkedIn, Email) in the Hero section. |
 | **Screensaver Master**| 🌙 | Leave the site idle for 60 seconds until the screensaver appears. |
+| **Perfect Corner!** | 🎯 | Wait for the screensaver DVD logo to hit a corner perfectly (Patience required!). |
 | **Do a Barrel Roll!** | 🔄 | Click the name "Ankit Kumar" in the main Hero section 3 times rapidly. |
 | **Gravity Wizard** | 🧲 | Hover over Project cards or Skill icons to trigger the gravity effect 5 times. |
 
@@ -52,7 +53,7 @@ Spoilers ahead! This guide reveals how to unlock every single achievement in the
 | **Cowsay User** | 🐄 | Type `cowsay hello` in the terminal. |
 | **BSOD Trigger** | 💀 | Type `bsod`, `rm -rf /`, or `sudo rm -rf /` in the terminal. |
 | **Error Catcher** | 🚨 | Trigger an error toast (e.g. click a project card repeatedly/quickly until it simulates an error). |
-| **Easter Egg Hunter** | 🥚 | Unlock all the "Fun & Random" achievements listed above (+ Konami + Screensaver + Barrel Roll). |
+| **Easter Egg Hunter** | 🥚 | Unlock all the "Fun & Random" achievements listed above (+ Konami + Screensaver + Corner Hit + Barrel Roll). |
 | **Night Owl** | 🦉 | Visit the website between 12:00 AM and 2:00 AM. |
 
 ---

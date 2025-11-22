@@ -63,6 +63,36 @@ const Terminal: React.FC<TerminalProps> = ({ onClose, onMinimize, isMinimized = 
       });
   }, []);
 
+  // Handle Maximize Toggle with Fullscreen
+  const handleMaximizeToggle = (maximized: boolean) => {
+    setIsMaximized(maximized);
+    if (maximized) {
+      document.documentElement.requestFullscreen().catch((e) => {
+        console.log(`Error attempting to enable fullscreen mode: ${e.message} (${e.name})`);
+      });
+    } else {
+      if (document.fullscreenElement) {
+        document.exitFullscreen().catch((e) => {
+           console.log(`Error attempting to exit fullscreen mode: ${e.message} (${e.name})`);
+        });
+      }
+    }
+  };
+
+  // Sync state with native fullscreen changes (e.g. Escape key)
+  useEffect(() => {
+    const handleFullscreenChange = () => {
+      if (!document.fullscreenElement) {
+        setIsMaximized(false);
+      } else {
+        setIsMaximized(true);
+      }
+    };
+
+    document.addEventListener('fullscreenchange', handleFullscreenChange);
+    return () => document.removeEventListener('fullscreenchange', handleFullscreenChange);
+  }, []);
+
   // Custom Hooks
   useMatrixEffect(canvasRef, matrixMode, isMaximized);
   
@@ -108,6 +138,10 @@ const Terminal: React.FC<TerminalProps> = ({ onClose, onMinimize, isMinimized = 
   // Handle close - reset boot state
   const handleClose = () => {
     localStorage.removeItem('terminal_booted');
+    // Exit fullscreen if closed
+    if (document.fullscreenElement) {
+      document.exitFullscreen().catch(() => {});
+    }
     onClose();
   };
   
@@ -122,7 +156,8 @@ const Terminal: React.FC<TerminalProps> = ({ onClose, onMinimize, isMinimized = 
     activeComponent, setActiveComponent,
     setMatrixMode, setBsodTriggered,
     setInput, setCursorPos,
-    onClose, scrollToBottom,
+    onClose: handleClose, // Use modified handleClose
+    scrollToBottom,
     fileSystem
   });
 
@@ -137,7 +172,7 @@ const Terminal: React.FC<TerminalProps> = ({ onClose, onMinimize, isMinimized = 
   };
 
   const handleLoginAbort = () => {
-    onClose();
+    handleClose();
   };
 
   // --- Global Key Listener for Login Phase ---
@@ -303,7 +338,7 @@ const Terminal: React.FC<TerminalProps> = ({ onClose, onMinimize, isMinimized = 
         onClose={handleClose} 
         onMinimize={onMinimize}
         isMaximized={isMaximized} 
-        setIsMaximized={setIsMaximized} 
+        setIsMaximized={handleMaximizeToggle} 
         phase={phase} 
         path={currentPath} 
       />
