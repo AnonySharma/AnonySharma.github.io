@@ -279,7 +279,7 @@ export const SingPlayer: React.FC<{ onFinish: () => void }> = ({ onFinish }) => 
       }
       window.removeEventListener('keydown', handleKeyDown);
     };
-  }, []);
+  }, [status, onFinish]);
 
   if (status === 'loading') {
       return (

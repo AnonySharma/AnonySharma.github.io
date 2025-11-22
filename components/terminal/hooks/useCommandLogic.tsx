@@ -36,9 +36,10 @@ export const useCommandLogic = ({
 
     // --- Helper Functions for FS Traversal ---
     const getNodeAt = (path: string[]): FSNode | null => {
+        if (!fileSystem['~']) return null;
         let current: FSNode = fileSystem['~'];
         for (let i = 1; i < path.length; i++) {
-            if (current.type === 'dir' && current.children[path[i]]) {
+            if (current.type === 'dir' && current.children && current.children[path[i]]) {
                 current = current.children[path[i]];
             } else {
                 return null;
@@ -336,8 +337,9 @@ export const useCommandLogic = ({
                             } else {
                                 newLines.push({ type: 'output', content: <span className="text-red-400">cd: not a directory: {args[0]}</span> });
                             }
-                        } catch (e: any) {
-                            newLines.push({ type: 'output', content: <span className="text-red-400">{e.message}</span> });
+                        } catch (e) {
+                            const errorMessage = e instanceof Error ? e.message : 'Unknown error occurred';
+                            newLines.push({ type: 'output', content: <span className="text-red-400">{errorMessage}</span> });
                         }
                     }
                     break;

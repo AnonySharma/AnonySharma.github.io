@@ -17,7 +17,7 @@ const Projects: React.FC = () => {
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {PROJECTS.map((project) => (
-                <div key={project.id} className="group bg-dark border border-slate-800 rounded-xl overflow-hidden hover:border-slate-600 transition-all hover:shadow-xl hover:shadow-primary/10 flex flex-col h-full">
+                <div key={project.id} className="group bg-slate-950 border border-slate-800 rounded-xl overflow-hidden hover:border-slate-600 transition-all hover:shadow-xl hover:shadow-primary/10 flex flex-col h-full">
                     <div className="relative h-48 overflow-hidden bg-slate-800">
                         <img 
                             src={project.imageUrl} 

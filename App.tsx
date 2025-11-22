@@ -7,14 +7,13 @@ import Projects from './components/Projects';
 import Contact from './components/Contact';
 
 // Lazy load heavy components that are conditionally rendered
-const AiChat = lazy(() => import('./components/AiChat').catch(() => ({ default: () => null })));
 const Terminal = lazy(() => import('./components/Terminal').catch(() => ({ default: () => null })));
 
 function App() {
   const [showTerminal, setShowTerminal] = useState(false);
 
   return (
-    <div className="min-h-screen bg-dark text-slate-200 font-sans">
+    <div className="min-h-screen bg-slate-950 text-slate-200 font-sans">
       <Suspense fallback={null}>
         {showTerminal && <Terminal onClose={() => setShowTerminal(false)} />}
       </Suspense>
@@ -27,9 +26,6 @@ function App() {
         <Projects />
         <Contact />
       </main>
-      <Suspense fallback={null}>
-        {!showTerminal && <AiChat />}
-      </Suspense>
     </div>
   );
 }

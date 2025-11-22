@@ -11,10 +11,6 @@ export default defineConfig(({ mode }) => {
         host: '0.0.0.0',
       },
       plugins: [react()],
-      define: {
-        'process.env.API_KEY': JSON.stringify(env.GEMINI_API_KEY),
-        'process.env.GEMINI_API_KEY': JSON.stringify(env.GEMINI_API_KEY)
-      },
       resolve: {
         alias: {
           '@': path.resolve(__dirname, '.'),
@@ -26,8 +22,6 @@ export default defineConfig(({ mode }) => {
             manualChunks: {
               // Separate React and React DOM into their own chunk
               'react-vendor': ['react', 'react-dom'],
-              // Separate Google GenAI SDK (likely large)
-              'genai-vendor': ['@google/genai'],
               // Separate lucide-react icons
               'icons-vendor': ['lucide-react'],
             },

@@ -94,8 +94,23 @@ export const PsOutput = () => {
     );
 };
 
+interface ProcessStat {
+    pid: number;
+    user: string;
+    pri: number;
+    ni: number;
+    virt: string;
+    res: string;
+    shr: string;
+    s: string;
+    cpu: string;
+    mem: number;
+    time: string;
+    command: string;
+}
+
 export const TopProcess: React.FC<{ onExit: (finalSnapshot: React.ReactNode) => void, scrollToBottom: () => void }> = ({ onExit, scrollToBottom }) => {
-    const [stats, setStats] = useState<any[]>([]);
+    const [stats, setStats] = useState<ProcessStat[]>([]);
     const [header, setHeader] = useState('');
     const containerRef = useRef<HTMLDivElement>(null);
 

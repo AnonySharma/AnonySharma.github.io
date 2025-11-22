@@ -27,7 +27,7 @@ const Hero: React.FC = () => {
         </p>
 
         <div className="flex flex-col sm:flex-row gap-4">
-          <a href="#projects" className="flex items-center justify-center px-8 py-3 rounded-full bg-white text-dark font-bold hover:bg-slate-200 transition-all transform hover:scale-105">
+          <a href="#projects" className="flex items-center justify-center px-8 py-3 rounded-full bg-white text-slate-950 font-bold hover:bg-slate-200 transition-all transform hover:scale-105">
             View Projects
             <ArrowRight className="ml-2 h-5 w-5" />
           </a>
@@ -37,13 +37,13 @@ const Hero: React.FC = () => {
         </div>
 
         <div className="mt-12 flex gap-6 text-slate-400">
-            <a href="https://github.com" target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors">
+            <a href="https://github.com/AnonySharma" target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors" aria-label="GitHub Profile">
                 <Github size={24} />
             </a>
-            <a href={CONTACT_INFO.linkedin} target="_blank" rel="noopener noreferrer" className="hover:text-blue-400 transition-colors">
+            <a href={CONTACT_INFO.linkedin} target="_blank" rel="noopener noreferrer" className="hover:text-blue-400 transition-colors" aria-label="LinkedIn Profile">
                 <Linkedin size={24} />
             </a>
-            <a href={`mailto:${CONTACT_INFO.email}`} className="hover:text-secondary transition-colors">
+            <a href={`mailto:${CONTACT_INFO.email}`} className="hover:text-secondary transition-colors" aria-label="Send Email">
                 <Mail size={24} />
             </a>
         </div>

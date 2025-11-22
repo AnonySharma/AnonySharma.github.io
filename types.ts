@@ -15,10 +15,3 @@ export interface Experience {
   location: string;
   description: string[];
 }
-
-export interface ChatMessage {
-  role: 'user' | 'model';
-  text: string;
-  timestamp: Date;
-  isStreaming?: boolean;
-}
