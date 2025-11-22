@@ -7,76 +7,7 @@ import { CowsayOutput, MatrixProcess, SteamLocomotive, CryptoMiner, TypeGame, Si
 import { SyntaxHighlighter } from '../SyntaxHighlighter';
 import { SKILLS } from '../../../constants';
 import { useAchievements } from '../../../contexts/AchievementContext';
-
-// DevMode Status Component with Toggle
-const DevModeStatus: React.FC<{ 
-    found: Array<{ key: string; name: string }>; 
-    easterEggs: Array<{ key: string; name: string }> 
-}> = ({ found, easterEggs }) => {
-    const { stats } = useAchievements();
-    const [achievementsUnlocked, setAchievementsUnlocked] = useState(() => {
-        return localStorage.getItem('achievements_unlocked') === 'true';
-    });
-
-    useEffect(() => {
-        // Check for changes in localStorage (in case unlocked from another tab/component)
-        const checkUnlock = () => {
-            const unlocked = localStorage.getItem('achievements_unlocked') === 'true';
-            setAchievementsUnlocked(unlocked);
-        };
-        const interval = setInterval(checkUnlock, 500);
-        return () => clearInterval(interval);
-    }, []);
-
-    const handleToggle = () => {
-        if (!achievementsUnlocked) {
-            localStorage.setItem('achievements_unlocked', 'true');
-            setAchievementsUnlocked(true);
-            // Trigger a custom event to notify Achievements component
-            window.dispatchEvent(new Event('achievementsUnlocked'));
-        }
-    };
-
-    const isDevMode = !!stats.developer_mode;
-
-    return (
-        <div className="font-mono text-sm space-y-2">
-            <div className="text-green-400 font-bold">Developer Mode Status:</div>
-            <div className={isDevMode ? 'text-green-400' : 'text-red-400'}>
-                {isDevMode ? '✓ ACTIVE' : '✗ INACTIVE'}
-            </div>
-            <div className="text-cyan-400 font-bold mt-4">Easter Eggs Found: {found.length}/{easterEggs.length}</div>
-            <div className="text-slate-400 text-xs space-y-1">
-                {found.map((egg, idx) => (
-                    <div key={idx} className="text-green-400">✓ {egg.name}</div>
-                ))}
-                {easterEggs.filter(egg => !found.some(f => f.key === egg.key)).map((egg, idx) => (
-                    <div key={idx} className="text-slate-600">✗ {egg.name}</div>
-                ))}
-            </div>
-            {!isDevMode && (
-                <div className="text-yellow-400 text-xs mt-2">💡 Tip: Try the Konami code to unlock developer mode!</div>
-            )}
-            <div className="text-cyan-400 font-bold mt-4">Achievements Panel:</div>
-            <div className="flex items-center gap-3">
-                <div className={achievementsUnlocked ? 'text-green-400' : 'text-red-400'}>
-                    {achievementsUnlocked ? '✓ UNLOCKED' : '✗ LOCKED'}
-                </div>
-                {!achievementsUnlocked && (
-                    <button
-                        onClick={handleToggle}
-                        className="px-3 py-1 bg-primary hover:bg-indigo-600 text-white text-xs font-bold rounded transition-colors border border-primary/50 hover:border-primary"
-                    >
-                        [UNLOCK]
-                    </button>
-                )}
-            </div>
-            {achievementsUnlocked && (
-                <div className="text-green-400 text-xs mt-1">The achievements button is now visible in the bottom-left corner.</div>
-            )}
-        </div>
-    );
-};
+import { DevModeStatus } from '../ui/DevModeStatus';
 
 interface CommandLogicProps {
     lines: TerminalLine[];
@@ -180,7 +111,7 @@ export const useCommandLogic = ({
             'cowsay', 'whoami', 'pwd', 'exit', 'sudo', 'rm', 'vim', 'vi', 
             'nano', 'emacs', 'weather', 'coinflip', 'hack', 'coffee', 'brew', 
             'joke', '42', 'eastereggs', 'whois', 'fortune', 'fire', 'docker', 
-            'game', 'party', 'bsod', 'skills', 'resume', 'devmode', 'developer', 'history', 'tree'
+            'game', 'party', 'bsod', 'skills', 'resume', 'devmode', 'developer', 'history', 'tree', 'screensaver'
         ];
 
         const args = input.split(' ');
@@ -497,7 +428,25 @@ export const useCommandLogic = ({
                     break;
 
                 case 'whoami':
-                    newLines.push({ type: 'output', content: 'visitor' });
+                    // Random existential crisis
+                    const whoamiResponses = [
+                        "visitor",
+                        "visitor",
+                        "visitor",
+                        "visitor",
+                        "visitor",
+                        "visitor",
+                        "visitor",
+                        "visitor", // Higher weight for normal response
+                        "I don't know, who are YOU?",
+                        "A figment of my simulation.",
+                        <span className="text-red-400">System.User.NullReferenceException</span>,
+                        "Batman 🦇",
+                        "The one who knocks.",
+                        "Just another brick in the wall."
+                    ];
+                    const randomResponse = whoamiResponses[Math.floor(Math.random() * whoamiResponses.length)];
+                    newLines.push({ type: 'output', content: randomResponse });
                     break;
 
                 case 'skills':
@@ -715,7 +664,8 @@ export const useCommandLogic = ({
                         { key: 'fire_used', name: 'Fire' },
                         { key: 'typing_test', name: 'Typing Test' },
                         { key: 'cowsay_used', name: 'Cowsay' },
-                        { key: 'bsod_triggered', name: 'BSOD' }
+                        { key: 'bsod_triggered', name: 'BSOD' },
+                        { key: 'screensaver_active', name: 'Screensaver' }
                     ];
                     const found = easterEggs.filter(egg => !!stats[egg.key]);
                     newLines.push({
@@ -758,9 +708,22 @@ export const useCommandLogic = ({
                                 <div>game</div>
                                 <div>party</div>
                                 <div>bsod</div>
+                                <div>screensaver</div>
                             </div>
                         )
                     });
+                    break;
+
+                case 'screensaver':
+                    // Manually trigger screensaver event (though the component handles it via timeout)
+                    // This is a bit of a hack since screensaver is global overlay
+                    // Ideally we would dispatch a custom event that Screensaver component listens to
+                    
+                    // Small delay to allow render
+                    setTimeout(() => {
+                        window.dispatchEvent(new Event('force_screensaver'));
+                    }, 100);
+                    newLines.push({ type: 'output', content: <span className="text-green-400">Initializing Sleep Mode...</span> });
                     break;
 
                 case 'bsod':

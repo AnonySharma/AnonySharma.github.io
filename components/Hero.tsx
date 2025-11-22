@@ -1,12 +1,35 @@
 import React, { useState } from 'react';
-import { ArrowRight, Github, Linkedin, Mail, Download, FileText } from 'lucide-react';
+import { ArrowRight, Github, Linkedin, Mail, Download } from 'lucide-react';
 import { CONTACT_INFO } from '../constants';
 import { useAchievements } from '../contexts/AchievementContext';
 
 const Hero: React.FC = () => {
   const [downloadCount, setDownloadCount] = useState(0);
   const [showEasterEgg, setShowEasterEgg] = useState(false);
+  const [nameClickCount, setNameClickCount] = useState(0);
   const { trackEvent } = useAchievements();
+
+  const handleNameClick = () => {
+    const newCount = nameClickCount + 1;
+    setNameClickCount(newCount);
+
+    if (newCount === 3) {
+      document.body.classList.add('do-barrel-roll');
+      trackEvent('barrel_roll', true);
+      setTimeout(() => {
+        document.body.classList.remove('do-barrel-roll');
+        setNameClickCount(0);
+      }, 1000);
+    }
+
+    // Reset count if not clicked within 1 second
+    setTimeout(() => {
+      setNameClickCount(prev => {
+        if (prev === newCount) return 0;
+        return prev;
+      });
+    }, 1000);
+  };
 
   const handleResumeDownload = () => {
     const count = downloadCount + 1;
@@ -42,7 +65,7 @@ const Hero: React.FC = () => {
            ICPC'21 Regionalist | Rank 61
         </div>
         
-        <h1 className="text-5xl md:text-7xl font-bold text-white mb-6 leading-tight">
+        <h1 className="text-5xl md:text-7xl font-bold text-white mb-6 leading-tight select-none cursor-pointer" onClick={handleNameClick}>
           Ankit Kumar<br />
           <span className="text-3xl md:text-5xl text-transparent bg-clip-text bg-gradient-to-r from-primary to-cyan-400">MTS @ Salesforce</span>
         </h1>

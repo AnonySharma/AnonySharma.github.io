@@ -8,6 +8,7 @@ import { Prompt } from './terminal/ui/Prompt';
 import { useMatrixEffect } from './terminal/hooks/useMatrixEffect';
 import { useBootSequence } from './terminal/hooks/useBootSequence';
 import { useCommandLogic } from './terminal/hooks/useCommandLogic';
+import { useSound } from '../contexts/SoundContext';
 
 interface TerminalProps {
   onClose: () => void;
@@ -16,6 +17,7 @@ interface TerminalProps {
 }
 
 const Terminal: React.FC<TerminalProps> = ({ onClose, onMinimize, isMinimized = false }) => {
+  const { playBoot, playType, playClick } = useSound();
   // Phases: static (glitch) -> boot (logs) -> login (prompt) -> shell (interactive)
   const [phase, setPhase] = useState<'static' | 'boot' | 'login' | 'shell'>(() => {
     // Check if terminal was previously booted (not closed)
@@ -66,6 +68,13 @@ const Terminal: React.FC<TerminalProps> = ({ onClose, onMinimize, isMinimized = 
   
   // Check if terminal should boot (only if not previously booted)
   const shouldBoot = !localStorage.getItem('terminal_booted') || localStorage.getItem('terminal_booted') !== 'true';
+  
+  useEffect(() => {
+    if (phase === 'static' && !isMinimized) {
+        playBoot();
+    }
+  }, [phase, isMinimized, playBoot]);
+
   useBootSequence(phase, setPhase, setLines, scrollToBottom, shouldBoot);
   
   // Mark as booted when reaching shell phase
@@ -156,7 +165,8 @@ const Terminal: React.FC<TerminalProps> = ({ onClose, onMinimize, isMinimized = 
   }, [lines, phase, input, activeComponent, scrollToBottom]);
 
   const focusInput = () => {
-    if (phase === 'shell' && !activeComponent) {
+    // Only focus if no text is selected
+    if (phase === 'shell' && !activeComponent && !window.getSelection()?.toString()) {
       inputRef.current?.focus();
     }
   };
@@ -166,15 +176,25 @@ const Terminal: React.FC<TerminalProps> = ({ onClose, onMinimize, isMinimized = 
   };
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
-    // Check for Copy shortcut (Ctrl+C)
-    if (e.key === 'c' && (e.ctrlKey || e.metaKey)) {
-         if (window.getSelection()?.toString()) {
-             return;
-         }
+    if (e.key.length === 1 && !e.ctrlKey && !e.metaKey && !e.altKey) {
+        playType();
+    } else if (e.key === 'Enter') {
+        playClick();
+    }
+
+    // Ctrl+C: Cancel/Interrupt (Signal)
+    if (e.key === 'c' && e.ctrlKey && !e.metaKey) {
+         e.preventDefault();
          setLines(prev => [...prev, { type: 'input', content: input + '^C' }]);
          setInput('');
          setCursorPos(0);
          return;
+    }
+
+    // Cmd+C: Copy (Native browser behavior)
+    if (e.key === 'c' && e.metaKey) {
+        // Allow default copy behavior
+        return;
     }
 
     if (e.key === 'Enter') {
@@ -250,7 +270,13 @@ const Terminal: React.FC<TerminalProps> = ({ onClose, onMinimize, isMinimized = 
   return (
     <div 
       className={`fixed z-[100] ${bgColor} ${textColor} font-mono p-4 sm:p-8 overflow-hidden flex flex-col ${animationClass} ${isMaximized ? 'inset-0' : 'inset-0'}`}
-      onClick={focusInput}
+      onClick={(e) => {
+        // Only focus input if click is directly on the terminal container or void space
+        // and NOT if the user is selecting text
+        if (window.getSelection()?.toString()) return;
+        
+        focusInput();
+      }}
       style={{ 
           fontFamily: "'Fira Code', 'JetBrains Mono', monospace",
           textShadow: matrixMode ? '0 0 8px rgba(34, 197, 94, 0.8)' : 'none',

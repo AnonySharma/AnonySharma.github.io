@@ -1,63 +1,94 @@
-import React from 'react';
-import { ABOUT_TEXT, EXPERIENCE } from '../constants';
-import { Briefcase, GraduationCap, Award } from 'lucide-react';
+import React, { useEffect, useState } from 'react';
+import { Terminal, Coffee, Code2, Cpu } from 'lucide-react';
+import { useAchievements } from '../contexts/AchievementContext';
 
 const About: React.FC = () => {
+  const { stats } = useAchievements();
+  const [showGlasses, setShowGlasses] = useState(false);
+
+  useEffect(() => {
+    if (stats.konami_unlocked) {
+      setShowGlasses(true);
+    }
+  }, [stats.konami_unlocked]);
+
   return (
-    <section id="about" className="py-24 bg-slate-950">
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-        
-        {/* Bio Section */}
-        <div className="text-center mb-20">
-            <h2 className="text-3xl md:text-4xl font-bold text-white mb-8">About Me</h2>
-            <div className="prose prose-invert prose-lg mx-auto text-slate-300 leading-loose max-w-4xl">
-                <p>{ABOUT_TEXT}</p>
-            </div>
-            
-            <div className="mt-12 flex flex-wrap justify-center gap-8">
-                <div className="flex items-center gap-3 px-6 py-3 bg-slate-900/50 rounded-full border border-slate-800">
-                    <Award className="text-primary" />
-                    <span className="text-white font-semibold">Rank 61 - ICPC Regionals</span>
+    <section id="about" className="py-20 bg-slate-950 relative overflow-hidden">
+      {/* Background decoration */}
+      <div className="absolute top-0 right-0 w-1/3 h-full bg-gradient-to-l from-primary/5 to-transparent"></div>
+      
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+        <div className="flex flex-col md:flex-row items-center gap-12">
+          {/* Image Column */}
+          <div className="w-full md:w-1/2 flex justify-center">
+            <div className="relative group">
+              <div className="absolute -inset-4 bg-gradient-to-r from-primary to-secondary rounded-full opacity-75 group-hover:opacity-100 blur transition duration-1000 group-hover:duration-200"></div>
+              <div className="relative w-64 h-64 rounded-full overflow-hidden border-4 border-slate-800 shadow-2xl">
+                <img 
+                  src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?fit=crop&w=800&q=80" 
+                  alt="Ankit Kumar" 
+                  className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+                />
+                {/* Thug Life Glasses Overlay */}
+                <div 
+                    className={`absolute top-[35%] left-1/2 -translate-x-1/2 w-32 pointer-events-none transition-all duration-500 ${showGlasses ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-20'}`}
+                >
+                    <img 
+                        src="https://upload.wikimedia.org/wikipedia/commons/thumb/f/f4/Deal_with_it_glasses.svg/1200px-Deal_with_it_glasses.svg.png" 
+                        alt="Thug Life"
+                        className="w-full drop-shadow-lg"
+                    />
                 </div>
-                <div className="flex items-center gap-3 px-6 py-3 bg-slate-900/50 rounded-full border border-slate-800">
-                    <GraduationCap className="text-secondary" />
-                    <span className="text-white font-semibold">IIT (BHU) Varanasi '23</span>
-                </div>
+              </div>
+              
+              {/* Floating badge */}
+              <div className="absolute -bottom-4 -right-4 bg-slate-900 p-3 rounded-xl border border-slate-700 shadow-xl flex items-center gap-2 animate-bounce">
+                <Terminal className="text-green-400" size={20} />
+                <span className="text-slate-200 font-mono text-xs">
+                  System.out.println("Hello World");
+                </span>
+              </div>
             </div>
-        </div>
-
-        {/* Experience Timeline */}
-        <div id="experience">
-            <h3 className="text-2xl font-bold text-white mb-12 flex items-center gap-2">
-                <Briefcase className="text-primary" />
-                Work Experience
-            </h3>
+          </div>
+          
+          {/* Content Column */}
+          <div className="w-full md:w-1/2">
+            <h2 className="text-3xl md:text-4xl font-bold text-white mb-6">
+              About Me
+            </h2>
             
-            <div className="relative border-l-2 border-slate-800 ml-3 space-y-12">
-                {EXPERIENCE.map((exp) => (
-                    <div key={exp.id} className="relative pl-8 md:pl-12">
-                        <div className="absolute -left-[9px] top-0 w-4 h-4 rounded-full bg-slate-900 border-4 border-primary"></div>
-                        
-                        <div className="flex flex-col sm:flex-row sm:justify-between sm:items-baseline mb-2">
-                            <h4 className="text-xl font-bold text-white">{exp.role}</h4>
-                            <span className="text-sm text-primary font-mono">{exp.period}</span>
-                        </div>
-                        
-                        <div className="text-lg text-slate-200 font-medium mb-1">{exp.company}</div>
-                        <div className="text-sm text-slate-500 mb-4 flex items-center gap-1">
-                           {exp.location}
-                        </div>
-                        
-                        <ul className="list-disc list-outside ml-4 text-slate-400 space-y-2">
-                            {exp.description.map((item, i) => (
-                                <li key={i}>{item}</li>
-                            ))}
-                        </ul>
-                    </div>
-                ))}
+            <div className="space-y-6 text-slate-400 text-lg leading-relaxed">
+              <p>
+                I'm a <span className="text-primary font-bold">Member of Technical Staff at Salesforce</span>, 
+                where I architect scalable cloud solutions. Before that, I built financial tech at Scapia and 
+                graduated from <span className="text-secondary font-bold">IIT (BHU) Varanasi</span> in 2023.
+              </p>
+              
+              <p>
+                My coding philosophy is simple: <span className="italic text-white">"Make it work, make it right, make it fast."</span>
+              </p>
+              
+              <p>
+                When I'm not debugging race conditions or optimizing database queries, you can find me 
+                competing in coding contests (ICPC Regionalist 🏆), exploring open source, or 
+                customizing my terminal configuration for the 100th time.
+              </p>
             </div>
-        </div>
 
+            <div className="grid grid-cols-2 gap-4 mt-8">
+              <div className="p-4 bg-slate-900 rounded-lg border border-slate-800 hover:border-primary/50 transition-colors group">
+                <Cpu className="text-primary mb-2 group-hover:rotate-180 transition-transform duration-700" />
+                <h3 className="text-white font-bold">Problem Solver</h3>
+                <p className="text-sm text-slate-500">Data Structures & Algos</p>
+              </div>
+              <div className="p-4 bg-slate-900 rounded-lg border border-slate-800 hover:border-secondary/50 transition-colors group">
+                <Code2 className="text-secondary mb-2 group-hover:scale-110 transition-transform" />
+                <h3 className="text-white font-bold">Full Stack</h3>
+                <p className="text-sm text-slate-500">React, Node, Spring</p>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
     </section>
   );

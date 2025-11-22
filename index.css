@@ -32,6 +32,13 @@
   }
 }
 
+@layer utilities {
+  .min-h-screen {
+    min-height: 100vh; /* Fallback */
+    min-height: 100dvh;
+  }
+}
+
 /* Terminal-specific scrollbar */
 .custom-scrollbar::-webkit-scrollbar {
   width: 8px;
@@ -230,4 +237,16 @@
   animation: slideOutToRight 0.2s ease-in forwards;
 }
 
+/* Barrel Roll Animation */
+@keyframes barrelRoll {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
 
+.do-barrel-roll {
+  animation: barrelRoll 1s ease-in-out;
+}

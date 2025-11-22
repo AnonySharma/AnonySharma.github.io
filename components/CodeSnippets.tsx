@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Code2, Copy, Check, ExternalLink } from 'lucide-react';
+import { Code2, Copy, Check } from 'lucide-react';
 import { useAchievements } from '../contexts/AchievementContext';
 
 interface CodeSnippet {

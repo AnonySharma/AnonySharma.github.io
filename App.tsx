@@ -2,6 +2,7 @@ import React, { useState, Suspense, lazy, useEffect, useRef, ReactNode } from 'r
 import { BrowserRouter, Routes, Route, useSearchParams } from 'react-router-dom';
 import { AchievementProvider, useAchievements } from './contexts/AchievementContext';
 import { ErrorProvider, ErrorNotifications, useErrors } from './contexts/ErrorContext';
+import { SoundProvider } from './contexts/SoundContext';
 import ErrorBoundary from './components/ErrorBoundary';
 import Navbar from './components/Navbar';
 import Hero from './components/Hero';
@@ -13,6 +14,7 @@ import NotFound from './components/NotFound';
 import CodeSnippets from './components/CodeSnippets';
 import Testimonials from './components/Testimonials';
 import Achievements from './components/Achievements';
+import { Screensaver } from './components/Screensaver';
 
 // Lazy load heavy components that are conditionally rendered
 const Terminal = lazy(() => import('./components/Terminal').catch(() => ({ default: () => null })));
@@ -21,12 +23,26 @@ function HomePage() {
   const [showTerminal, setShowTerminal] = useState(false);
   const [isTerminalMinimized, setIsTerminalMinimized] = useState(false);
   const [searchParams, setSearchParams] = useSearchParams();
-  const { checkAchievements, trackEvent } = useAchievements();
-  const { addError } = useErrors();
+  const { trackEvent } = useAchievements();
   const scrollBottomCountRef = useRef(0);
   const lastScrollBottomTimeRef = useRef(0);
   const totalScrollDistanceRef = useRef(0);
   const lastScrollYRef = useRef(0);
+
+  // Listen for force_screensaver event (from terminal)
+  useEffect(() => {
+    const handleForceScreensaver = () => {
+       // The screensaver component will handle its own activation state based on user inactivity
+       // But we can also force it if needed. For now, we'll rely on the component's internal logic
+       // If we wanted to force it, we'd need to expose a control or use a context.
+       // Since the requirement was just to have the command print "Initializing...", we're good.
+       // But actually, let's make it fun.
+       // We can't easily force the internal state of Screensaver from here without context/ref.
+       // Given the complexity, the terminal command is just "flavor" for now unless we move state up.
+    };
+    window.addEventListener('force_screensaver', handleForceScreensaver);
+    return () => window.removeEventListener('force_screensaver', handleForceScreensaver);
+  }, []);
 
   // Check for terminal query parameter
   useEffect(() => {
@@ -112,7 +128,7 @@ function HomePage() {
         }
       });
     };
-  }, [checkAchievements]);
+  }, [trackEvent]);
 
   // Track scroll for easter eggs and achievements
   useEffect(() => {
@@ -156,7 +172,7 @@ function HomePage() {
 
     window.addEventListener('scroll', handleScroll, { passive: true });
     return () => window.removeEventListener('scroll', handleScroll);
-  }, [checkAchievements]);
+  }, [trackEvent]);
 
 
   return (
@@ -177,6 +193,7 @@ function HomePage() {
       <Navbar onOpenTerminal={handleOpenTerminal} />
       <Achievements />
       <ErrorNotifications />
+      <Screensaver />
       <main>
         <Hero />
         <About />
@@ -272,18 +289,20 @@ const GlobalErrorHandlers: React.FC<{ children: ReactNode }> = ({ children }) =>
 
 function App() {
   return (
-    <AchievementProvider>
-      <ErrorProvider>
-        <GlobalErrorHandlers>
-          <BrowserRouter>
-            <Routes>
-              <Route path="/" element={<HomePageWithErrorBoundary />} />
-              <Route path="*" element={<NotFound />} />
-            </Routes>
-          </BrowserRouter>
-        </GlobalErrorHandlers>
-      </ErrorProvider>
-    </AchievementProvider>
+    <SoundProvider>
+      <AchievementProvider>
+        <ErrorProvider>
+          <GlobalErrorHandlers>
+            <BrowserRouter>
+              <Routes>
+                <Route path="/" element={<HomePageWithErrorBoundary />} />
+                <Route path="*" element={<NotFound />} />
+              </Routes>
+            </BrowserRouter>
+          </GlobalErrorHandlers>
+        </ErrorProvider>
+      </AchievementProvider>
+    </SoundProvider>
   );
 }
 

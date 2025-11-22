@@ -139,12 +139,13 @@ const ErrorNotificationItem: React.FC<{ error: ErrorInfo; onRemove: (id: string)
     };
   }, [showDetails, error.id, onRemove]);
 
-  const borderColor = error.type === 'error' ? '#dc2626' : error.type === 'warning' ? '#f59e0b' : '#3b82f6';
+  const borderColor = error.type === 'error' ? '#ef4444' : error.type === 'warning' ? '#f59e0b' : '#3b82f6';
+  const glowColor = error.type === 'error' ? 'rgba(239, 68, 68, 0.2)' : error.type === 'warning' ? 'rgba(245, 158, 11, 0.2)' : 'rgba(59, 130, 246, 0.2)';
 
   return (
     <div
       ref={containerRef}
-      className="bg-white rounded-md p-4 animate-in flex items-start gap-3 relative"
+      className="bg-slate-900/95 backdrop-blur-md border border-slate-700/50 rounded-lg p-4 animate-in flex items-start gap-3 relative overflow-hidden group"
       style={{ 
         zIndex: 99999,
         pointerEvents: 'auto',
@@ -155,59 +156,75 @@ const ErrorNotificationItem: React.FC<{ error: ErrorInfo; onRemove: (id: string)
         borderLeft: `4px solid ${borderColor}`,
         minWidth: '320px',
         maxWidth: '420px',
-        boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)'
+        boxShadow: `0 10px 15px -3px rgba(0, 0, 0, 0.5), 0 0 20px ${glowColor}`
       }}
     >
+      {/* Scanline effect */}
+      <div 
+        className="absolute inset-0 pointer-events-none opacity-5 z-0"
+        style={{
+          backgroundImage: 'linear-gradient(transparent 50%, rgba(0, 0, 0, 0.5) 50%)',
+          backgroundSize: '100% 4px'
+        }}
+      />
+
       {/* Icon */}
-      <div className="flex-shrink-0 mt-0.5">
+      <div className="flex-shrink-0 mt-0.5 relative z-10">
         {error.type === 'error' && (
           <div 
-            className="w-5 h-5 rounded-full flex items-center justify-center"
+            className="w-5 h-5 rounded-full flex items-center justify-center shadow-lg shadow-red-500/20"
             style={{ backgroundColor: borderColor }}
           >
-            <span className="text-white text-xs font-bold leading-none">!</span>
+            <span className="text-white text-xs font-bold leading-none font-mono">!</span>
           </div>
         )}
         {error.type === 'warning' && (
           <div className="relative w-5 h-5">
             <AlertTriangle 
               size={20} 
-              fill={borderColor}
-              stroke={borderColor}
-              strokeWidth={1.5}
+              className="text-yellow-500"
+              fill="rgba(245, 158, 11, 0.2)"
             />
-            <span className="absolute inset-0 flex items-center justify-center text-black text-[9px] font-bold leading-none" style={{ marginTop: '1px' }}>!</span>
           </div>
         )}
         {error.type === 'info' && (
           <div 
-            className="w-5 h-5 rounded-full flex items-center justify-center"
+            className="w-5 h-5 rounded-full flex items-center justify-center shadow-lg shadow-blue-500/20"
             style={{ backgroundColor: borderColor }}
           >
-            <span className="text-white text-xs font-bold leading-none">i</span>
+            <span className="text-white text-xs font-bold leading-none font-mono">i</span>
           </div>
         )}
       </div>
       
-      <div className="flex-1 min-w-0">
-        <div className="text-gray-900 text-sm font-medium leading-snug mb-2">{error.message}</div>
+      <div className="flex-1 min-w-0 relative z-10">
+        <div className="text-slate-200 text-sm font-bold font-mono mb-1 tracking-wide flex items-center gap-2">
+          {error.type === 'error' ? 'ERROR' : error.type === 'warning' ? 'WARNING' : 'INFO'}
+          <span className="text-[10px] font-normal text-slate-500 opacity-50">
+            [{new Date(error.timestamp).toLocaleTimeString('en-GB', { hour12: false })}]
+          </span>
+        </div>
+        
+        <div className="text-slate-300 text-sm font-mono leading-snug mb-2 opacity-90">
+          {error.message}
+        </div>
         
         {error.details && (
           <div className="mb-2">
             <button
               ref={toggleButtonRef}
               type="button"
-              className="text-gray-500 hover:text-gray-700 text-xs underline cursor-pointer flex items-center gap-1 relative z-10 transition-colors"
+              className="text-primary hover:text-green-400 text-xs font-mono underline cursor-pointer flex items-center gap-1 relative z-10 transition-colors"
               style={{ pointerEvents: 'auto' }}
               aria-expanded={showDetails}
               aria-label={showDetails ? 'Hide details' : 'Show details'}
             >
               <span className="text-[9px]">{showDetails ? '▼' : '▶'}</span>
-              <span>Show details</span>
+              <span>trace_stack.log</span>
             </button>
             {showDetails && (
               <div 
-                className="text-gray-600 text-xs font-mono break-words whitespace-pre-wrap mt-2 p-3 rounded bg-gray-50 border border-gray-200 max-h-64 overflow-y-auto custom-scrollbar"
+                className="text-green-400/80 text-xs font-mono break-words whitespace-pre-wrap mt-2 p-3 rounded bg-black/50 border border-slate-800 max-h-64 overflow-y-auto custom-scrollbar shadow-inner"
                 style={{ userSelect: 'text' }}
               >
                 {error.details}
@@ -215,16 +232,12 @@ const ErrorNotificationItem: React.FC<{ error: ErrorInfo; onRemove: (id: string)
             )}
           </div>
         )}
-        
-        <div className="text-gray-400 text-[10px] font-mono">
-          {new Date(error.timestamp).toLocaleTimeString()}
-        </div>
       </div>
       
       <button
         ref={removeButtonRef}
         type="button"
-        className="text-gray-400 hover:text-gray-600 transition-colors flex-shrink-0 p-1 relative z-10 rounded"
+        className="text-slate-500 hover:text-white transition-colors flex-shrink-0 p-1 relative z-10 rounded hover:bg-white/5"
         style={{ pointerEvents: 'auto' }}
         aria-label="Dismiss error"
       >

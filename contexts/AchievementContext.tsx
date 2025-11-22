@@ -11,9 +11,7 @@ export interface Achievement {
 
 interface AchievementContextType {
   achievements: Achievement[];
-  unlockAchievement: (id: string) => void;
   trackEvent: (key: string, value?: any) => void;
-  checkAchievements: () => void;
   unlockedCount: number;
   stats: Record<string, any>;
 }
@@ -21,6 +19,30 @@ interface AchievementContextType {
 const AchievementContext = createContext<AchievementContextType | undefined>(undefined);
 
 const ACHIEVEMENTS_DATA: Omit<Achievement, 'unlocked' | 'condition'>[] = [
+  {
+    id: 'screensaver_master',
+    name: 'Screensaver Master',
+    description: 'Kept the screensaver active for a while',
+    icon: '🌙',
+  },
+  {
+    id: 'corner_hit',
+    name: 'Perfect Corner!',
+    description: 'Watched the DVD logo hit the corner',
+    icon: '🎯',
+  },
+  {
+    id: 'barrel_roll',
+    name: 'Do a Barrel Roll!',
+    description: 'Did a barrel roll by clicking name 3 times',
+    icon: '🔄',
+  },
+  {
+    id: 'gravity_wizard',
+    name: 'Gravity Wizard',
+    description: 'Played with the gravity effect',
+    icon: '🧲',
+  },
   {
     id: 'terminal_master',
     name: 'Terminal Master',
@@ -205,6 +227,15 @@ const ACHIEVEMENTS_DATA: Omit<Achievement, 'unlocked' | 'condition'>[] = [
 
 const checkCondition = (id: string, stats: Record<string, any>): boolean => {
   switch (id) {
+    case 'screensaver_master':
+      return !!stats.screensaver_active;
+    case 'corner_hit':
+      return !!stats.corner_hit;
+    case 'barrel_roll':
+      return !!stats.barrel_roll;
+    case 'gravity_wizard':
+      // Assuming we track gravity interactions
+      return (stats.gravity_interactions || 0) >= 5;
     case 'terminal_master':
       return (stats.terminal_commands_used || 0) >= 10;
     case '404_explorer':
@@ -270,7 +301,8 @@ const checkCondition = (id: string, stats: Record<string, any>): boolean => {
       const eggs = [
         'konami_unlocked', 'sudo_sandwich', 'hack_attempted', 'fortune_used',
         'coffee_used', 'joke_used', 'answer_42', 'whois_used', 'docker_used',
-        'snake_played', 'party_started', 'fire_used', 'typing_test', 'cowsay_used'
+        'snake_played', 'party_started', 'fire_used', 'typing_test', 'cowsay_used',
+        'screensaver_active', 'barrel_roll', 'corner_hit'
       ];
       // Use logo_clicks >= 10 for logo_clicked_10 equivalent
       const logoOk = (stats.logo_clicks || 0) >= 10;
@@ -331,6 +363,16 @@ export const AchievementProvider: React.FC<{ children: ReactNode }> = ({ childre
       
       // Dispatch event for the notification component
       window.dispatchEvent(new Event('achievementsUnlocked'));
+      
+      // Check for 100% completion (all achievements unlocked)
+      if (newUnlockedIds.length === ACHIEVEMENTS_DATA.length) {
+         // Play victory music
+         const audio = new Audio('/assets/sounds/victory.mp3'); // Victory fanfare
+         audio.volume = 0.6;
+         audio.play().catch(e => console.log('Victory audio play failed', e));
+         
+         // Optional: Add a global visual effect or toast for 100% completion here
+      }
     }
   }, [stats, unlockedIds]);
 
@@ -363,32 +405,9 @@ export const AchievementProvider: React.FC<{ children: ReactNode }> = ({ childre
     });
   }, []);
 
-  const unlockAchievement = useCallback((id: string) => {
-    setUnlockedIds(prev => {
-      if (prev.includes(id)) return prev;
-      const next = [...prev, id];
-      localStorage.setItem('portfolio_achievements', JSON.stringify(next));
-      window.dispatchEvent(new Event('achievementsUnlocked'));
-      return next;
-    });
-  }, []);
-
-  // Compatibility check for periodic updates (like time-based)
-  const checkAchievements = useCallback(() => {
-    // Force a re-evaluation by setting stats to itself (shallow copy)
-    // Or handle time-based checks specifically
-    const hour = new Date().getHours();
-    if (hour >= 0 && hour < 2 && !unlockedIds.includes('night_owl')) {
-       // Force update to trigger night_owl check
-       setStats(prev => ({ ...prev }));
-    }
-  }, [unlockedIds]);
-
   return (
     <AchievementContext.Provider value={{ 
       achievements, 
-      unlockAchievement, 
-      checkAchievements, 
       trackEvent,
       unlockedCount: unlockedIds.length,
       stats

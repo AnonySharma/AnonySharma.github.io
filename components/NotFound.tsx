@@ -29,7 +29,7 @@ const NotFound: React.FC = () => {
   const [glitchActive, setGlitchActive] = useState(false);
   const [showEasterEgg, setShowEasterEgg] = useState(false);
   const excuseRef = useRef<HTMLDivElement>(null);
-  const { unlockAchievement, trackEvent } = useAchievements();
+  const { trackEvent } = useAchievements();
 
   // Track 404 visit for achievement
   useEffect(() => {
@@ -91,6 +91,12 @@ const NotFound: React.FC = () => {
         setShowEasterEgg(true);
         trackEvent('konami_unlocked', true);
         trackEvent('developer_mode', true);
+        
+        // Play 8-bit power up sound
+        const audio = new Audio('/assets/sounds/powerup.mp3');
+        audio.volume = 0.5;
+        audio.play().catch(e => console.log('Audio play failed', e));
+
         setTimeout(() => setShowEasterEgg(false), 5000);
         konamiCode = '';
       }

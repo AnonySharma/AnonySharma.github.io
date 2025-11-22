@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { Menu, X } from 'lucide-react';
+import { Menu, X, Volume2, VolumeX } from 'lucide-react';
 import { useAchievements } from '../contexts/AchievementContext';
+import { useSound } from '../contexts/SoundContext';
 
 interface NavbarProps {
   onOpenTerminal: () => void;
@@ -12,6 +13,7 @@ const Navbar: React.FC<NavbarProps> = ({ onOpenTerminal }) => {
   const [logoClickCount, setLogoClickCount] = useState(0);
   const [showEasterEgg, setShowEasterEgg] = useState(false);
   const { trackEvent } = useAchievements();
+  const { playHover, playClick, mute, toggleMute } = useSound();
 
   useEffect(() => {
     const handleScroll = () => setScrolled(window.scrollY > 50);
@@ -22,6 +24,7 @@ const Navbar: React.FC<NavbarProps> = ({ onOpenTerminal }) => {
   const handleLogoClick = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
+    playClick();
     
     const newCount = logoClickCount + 1;
     setLogoClickCount(newCount);
@@ -65,6 +68,7 @@ const Navbar: React.FC<NavbarProps> = ({ onOpenTerminal }) => {
           <button 
             type="button"
             onClick={handleLogoClick}
+            onMouseEnter={playHover}
             className="flex items-center space-x-2 group focus:outline-none cursor-pointer"
             title="Enter Terminal Mode"
           >
@@ -81,21 +85,51 @@ const Navbar: React.FC<NavbarProps> = ({ onOpenTerminal }) => {
           )}
 
           {/* Desktop Menu */}
-          <div className="hidden md:flex space-x-8">
+          <div className="hidden md:flex items-center space-x-8">
             {navLinks.map((link) => (
               <a
                 key={link.name}
                 href={link.href}
+                onMouseEnter={playHover}
+                onClick={playClick}
                 className="text-slate-300 hover:text-white hover:text-primary transition-colors text-sm font-medium uppercase tracking-wider"
               >
                 {link.name}
               </a>
             ))}
+            
+            {/* Mute Toggle */}
+            <button
+              onClick={() => {
+                toggleMute();
+                playClick();
+              }}
+              onMouseEnter={playHover}
+              className="text-slate-400 hover:text-white transition-colors"
+              title={mute ? "Unmute Sounds" : "Mute Sounds"}
+            >
+              {mute ? <VolumeX size={20} /> : <Volume2 size={20} />}
+            </button>
           </div>
 
           {/* Mobile Menu Button */}
-          <div className="md:hidden">
-            <button onClick={() => setIsOpen(!isOpen)} className="text-slate-300 hover:text-white">
+          <div className="md:flex items-center gap-4 md:hidden">
+             <button
+              onClick={() => {
+                toggleMute();
+                playClick();
+              }}
+              className="text-slate-400 hover:text-white mr-2"
+            >
+              {mute ? <VolumeX size={20} /> : <Volume2 size={20} />}
+            </button>
+            <button 
+              onClick={() => {
+                setIsOpen(!isOpen);
+                playClick();
+              }} 
+              className="text-slate-300 hover:text-white"
+            >
               {isOpen ? <X size={24} /> : <Menu size={24} />}
             </button>
           </div>

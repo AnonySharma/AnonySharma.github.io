@@ -1,6 +1,40 @@
 import React from 'react';
 import { SKILLS } from '../constants';
 import { Code2, Cpu, Layout, Terminal } from 'lucide-react';
+import { useGravity } from './terminal/hooks/useGravity';
+
+const SkillCard: React.FC<{ 
+  icon: React.ReactNode, 
+  title: string, 
+  skills: string[], 
+  colorClass: string,
+  iconColorClass: string,
+  hoverBgClass: string
+}> = ({ icon, title, skills, colorClass, iconColorClass, hoverBgClass }) => {
+  const gravity = useGravity(10);
+
+  return (
+    <div 
+      ref={gravity.ref}
+      style={gravity.style}
+      onMouseMove={gravity.onMouseMove}
+      onMouseLeave={gravity.onMouseLeave}
+      className={`bg-slate-800 p-8 rounded-2xl border border-slate-700 hover:${colorClass} transition-all group`}
+    >
+      <div className={`w-12 h-12 bg-slate-900 rounded-lg flex items-center justify-center mb-6 group-hover:${hoverBgClass} transition-colors`}>
+        <span className={iconColorClass}>{icon}</span>
+      </div>
+      <h3 className="text-xl font-bold text-white mb-4">{title}</h3>
+      <div className="flex flex-wrap gap-2">
+        {skills.map(skill => (
+          <span key={skill} className="px-3 py-1 bg-slate-900 text-slate-300 text-sm rounded-full border border-slate-700">
+            {skill}
+          </span>
+        ))}
+      </div>
+    </div>
+  );
+};
 
 const Skills: React.FC = () => {
   return (
@@ -15,46 +49,34 @@ const Skills: React.FC = () => {
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           {/* Languages & Core */}
-          <div className="bg-slate-800 p-8 rounded-2xl border border-slate-700 hover:border-primary/50 transition-all group">
-            <div className="w-12 h-12 bg-slate-900 rounded-lg flex items-center justify-center mb-6 group-hover:bg-primary/20 transition-colors">
-              <Code2 className="text-primary" />
-            </div>
-            <h3 className="text-xl font-bold text-white mb-4">Languages</h3>
-            <div className="flex flex-wrap gap-2">
-              <span className="px-3 py-1 bg-slate-900 text-slate-300 text-sm rounded-full border border-slate-700">C++</span>
-              <span className="px-3 py-1 bg-slate-900 text-slate-300 text-sm rounded-full border border-slate-700">JavaScript</span>
-              <span className="px-3 py-1 bg-slate-900 text-slate-300 text-sm rounded-full border border-slate-700">HTML</span>
-            </div>
-          </div>
+          <SkillCard 
+            icon={<Code2 />}
+            title="Languages"
+            skills={['C++', 'JavaScript', 'HTML']}
+            colorClass="border-primary/50"
+            iconColorClass="text-primary"
+            hoverBgClass="bg-primary/20"
+          />
 
           {/* Frameworks & Tools */}
-          <div className="bg-slate-800 p-8 rounded-2xl border border-slate-700 hover:border-cyan-500/50 transition-all group">
-            <div className="w-12 h-12 bg-slate-900 rounded-lg flex items-center justify-center mb-6 group-hover:bg-cyan-500/20 transition-colors">
-              <Layout className="text-cyan-500" />
-            </div>
-            <h3 className="text-xl font-bold text-white mb-4">Full Stack & Cloud</h3>
-            <div className="flex flex-wrap gap-2">
-               <span className="px-3 py-1 bg-slate-900 text-slate-300 text-sm rounded-full border border-slate-700">Spring Boot</span>
-               <span className="px-3 py-1 bg-slate-900 text-slate-300 text-sm rounded-full border border-slate-700">Flutter</span>
-               <span className="px-3 py-1 bg-slate-900 text-slate-300 text-sm rounded-full border border-slate-700">React</span>
-               <span className="px-3 py-1 bg-slate-900 text-slate-300 text-sm rounded-full border border-slate-700">AWS</span>
-               <span className="px-3 py-1 bg-slate-900 text-slate-300 text-sm rounded-full border border-slate-700">Material UI</span>
-            </div>
-          </div>
+          <SkillCard 
+            icon={<Layout />}
+            title="Full Stack & Cloud"
+            skills={['Spring Boot', 'Flutter', 'React', 'AWS', 'Material UI']}
+            colorClass="border-cyan-500/50"
+            iconColorClass="text-cyan-500"
+            hoverBgClass="bg-cyan-500/20"
+          />
 
           {/* Concepts */}
-          <div className="bg-slate-800 p-8 rounded-2xl border border-slate-700 hover:border-secondary/50 transition-all group">
-            <div className="w-12 h-12 bg-slate-900 rounded-lg flex items-center justify-center mb-6 group-hover:bg-secondary/20 transition-colors">
-              <Terminal className="text-secondary" />
-            </div>
-            <h3 className="text-xl font-bold text-white mb-4">Core Concepts</h3>
-            <div className="flex flex-wrap gap-2">
-              <span className="px-3 py-1 bg-slate-900 text-slate-300 text-sm rounded-full border border-slate-700">Data Structures</span>
-              <span className="px-3 py-1 bg-slate-900 text-slate-300 text-sm rounded-full border border-slate-700">Algorithms</span>
-              <span className="px-3 py-1 bg-slate-900 text-slate-300 text-sm rounded-full border border-slate-700">Problem Solving</span>
-              <span className="px-3 py-1 bg-slate-900 text-slate-300 text-sm rounded-full border border-slate-700">Loan Underwriting</span>
-            </div>
-          </div>
+          <SkillCard 
+            icon={<Terminal />}
+            title="Core Concepts"
+            skills={['Data Structures', 'Algorithms', 'Problem Solving', 'Loan Underwriting']}
+            colorClass="border-secondary/50"
+            iconColorClass="text-secondary"
+            hoverBgClass="bg-secondary/20"
+          />
         </div>
       </div>
     </section>

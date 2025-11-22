@@ -2,10 +2,47 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Monitor } from 'lucide-react';
 
-export const SysInfoOutput = () => (
+export const SysInfoOutput = () => {
+  const [repoCount, setRepoCount] = useState<string>('Loading...');
+  const [stars, setStars] = useState<string>('Loading...');
+  const [followers, setFollowers] = useState<string>('Loading...');
+
+  useEffect(() => {
+    const fetchStats = async () => {
+        try {
+            const response = await fetch('https://api.github.com/users/AnonySharma');
+            if (!response.ok) throw new Error('Failed to fetch');
+            const data = await response.json();
+            setRepoCount(data.public_repos.toString());
+            setFollowers(data.followers.toString());
+            
+            // To get total stars, we'd need to fetch all repos, but that's heavy.
+            // Let's just use a hardcoded base + some random logic or leave it as a static estimate for now 
+            // or try to fetch repos if user has few.
+            // For now, let's just show public_gists as "snippets" or something similar if stars is too hard.
+            // Actually, let's try to fetch repos for stars.
+            const reposRes = await fetch('https://api.github.com/users/AnonySharma/repos?per_page=100');
+            if (reposRes.ok) {
+                const repos = await reposRes.json();
+                const starCount = repos.reduce((acc: number, repo: any) => acc + repo.stargazers_count, 0);
+                setStars(starCount.toString());
+            } else {
+                setStars('N/A');
+            }
+
+        } catch (e) {
+            setRepoCount('Error');
+            setStars('Error');
+            setFollowers('Error');
+        }
+    };
+    fetchStats();
+  }, []);
+
+  return (
   <div className="font-mono text-sm space-y-1 mb-2">
     <div className="flex items-center gap-2 text-slate-400 border-b border-slate-700 pb-1 mb-2">
-        <Monitor size={14} /> <span>SYSTEM DIAGNOSTICS</span>
+        <Monitor size={14} /> <span>SYSTEM DIAGNOSTICS (LIVE)</span>
     </div>
     <div>OS: <span className="text-white">AnkitOS v2.4.0 LTS</span> (x86_64)</div>
     <div>Kernel: <span className="text-blue-400">5.15.0-76-generic</span></div>
@@ -19,12 +56,19 @@ export const SysInfoOutput = () => (
         Memory: <span className="text-white">64GB / 128GB</span> 
         <span className="text-green-400 ml-2">[||||||||||----------] 50%</span>
     </div>
-    <div className="flex gap-2 items-center">
+    <div className="mt-2 border-t border-slate-800 pt-2">
+        <div className="text-slate-400 mb-1">GITHUB METRICS:</div>
+        <div>Public Repos: <span className="text-cyan-400">{repoCount}</span></div>
+        <div>Total Stars: <span className="text-yellow-400">{stars}</span></div>
+        <div>Followers: <span className="text-purple-400">{followers}</span></div>
+    </div>
+    <div className="flex gap-2 items-center mt-2">
         Network: <span className="text-green-400">Connected (10Gbps uplink)</span> 
-        <span className="text-slate-500 text-xs">IP: 192.168.1.42</span>
+        <span className="text-slate-500 text-xs">IP: 127.0.0.1 (Localhost)</span>
     </div>
   </div>
-);
+  );
+};
 
 export const NeofetchOutput = () => (
     <div className="flex gap-6 font-mono text-sm mb-2 text-slate-300 flex-col sm:flex-row items-start">

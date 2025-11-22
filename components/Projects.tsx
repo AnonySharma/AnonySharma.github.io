@@ -2,6 +2,57 @@ import React, { useState } from 'react';
 import { PROJECTS } from '../constants';
 import { Github } from 'lucide-react';
 import { useErrors } from '../contexts/ErrorContext';
+import { useGravity } from './terminal/hooks/useGravity';
+
+const ProjectCard: React.FC<{ project: any, onClick: () => void, loading: boolean }> = ({ project, onClick, loading }) => {
+    const gravity = useGravity(15); // Strength of 15px
+
+    return (
+        <div 
+            ref={gravity.ref}
+            style={gravity.style}
+            onMouseMove={gravity.onMouseMove}
+            onMouseLeave={gravity.onMouseLeave}
+            onClick={onClick}
+            className="group bg-slate-950 border border-slate-800 rounded-xl overflow-hidden hover:border-slate-600 transition-all hover:shadow-xl hover:shadow-primary/10 flex flex-col h-full cursor-pointer"
+        >
+            <div className="relative h-48 overflow-hidden bg-slate-800">
+                <img 
+                    src={project.imageUrl} 
+                    alt={project.title} 
+                    className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110 opacity-80 group-hover:opacity-100"
+                />
+                {loading && (
+                    <div className="absolute inset-0 bg-black/70 flex items-center justify-center">
+                        <div className="text-white text-sm">Loading details...</div>
+                    </div>
+                )}
+                <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-4">
+                    <button 
+                        className="p-2 bg-white/10 rounded-full hover:bg-white/20 text-white backdrop-blur-sm transition-colors"
+                        onClick={(e) => {
+                            e.stopPropagation();
+                            // GitHub link would go here
+                        }}
+                    >
+                        <Github size={20} />
+                    </button>
+                </div>
+            </div>
+            <div className="p-6 flex-1 flex flex-col">
+                <h3 className="text-xl font-bold text-white mb-2 group-hover:text-primary transition-colors">{project.title}</h3>
+                <p className="text-slate-400 text-sm mb-4 flex-1">{project.description}</p>
+                <div className="flex flex-wrap gap-2 mt-auto">
+                    {project.tags.map((tag: string) => (
+                        <span key={tag} className="text-xs px-2 py-1 bg-slate-800 text-slate-300 rounded-md border border-slate-700">
+                            {tag}
+                        </span>
+                    ))}
+                </div>
+            </div>
+        </div>
+    );
+};
 
 const Projects: React.FC = () => {
   const { addError } = useErrors();
@@ -53,46 +104,12 @@ const Projects: React.FC = () => {
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {PROJECTS.map((project) => (
-                <div 
+                <ProjectCard 
                     key={project.id} 
+                    project={project} 
                     onClick={() => handleProjectClick(project.id, project.title)}
-                    className="group bg-slate-950 border border-slate-800 rounded-xl overflow-hidden hover:border-slate-600 transition-all hover:shadow-xl hover:shadow-primary/10 flex flex-col h-full cursor-pointer"
-                >
-                    <div className="relative h-48 overflow-hidden bg-slate-800">
-                        <img 
-                            src={project.imageUrl} 
-                            alt={project.title} 
-                            className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110 opacity-80 group-hover:opacity-100"
-                        />
-                        {loadingProject === project.id && (
-                            <div className="absolute inset-0 bg-black/70 flex items-center justify-center">
-                                <div className="text-white text-sm">Loading details...</div>
-                            </div>
-                        )}
-                        <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-4">
-                            <button 
-                                className="p-2 bg-white/10 rounded-full hover:bg-white/20 text-white backdrop-blur-sm transition-colors"
-                                onClick={(e) => {
-                                    e.stopPropagation();
-                                    // GitHub link would go here
-                                }}
-                            >
-                                <Github size={20} />
-                            </button>
-                        </div>
-                    </div>
-                    <div className="p-6 flex-1 flex flex-col">
-                        <h3 className="text-xl font-bold text-white mb-2 group-hover:text-primary transition-colors">{project.title}</h3>
-                        <p className="text-slate-400 text-sm mb-4 flex-1">{project.description}</p>
-                        <div className="flex flex-wrap gap-2 mt-auto">
-                            {project.tags.map(tag => (
-                                <span key={tag} className="text-xs px-2 py-1 bg-slate-800 text-slate-300 rounded-md border border-slate-700">
-                                    {tag}
-                                </span>
-                            ))}
-                        </div>
-                    </div>
-                </div>
+                    loading={loadingProject === project.id}
+                />
             ))}
         </div>
        </div>
