@@ -193,7 +193,7 @@ export const DockerPsOutput = () => (
             <span className="truncate">"/bin/sh -c 'npm sta…"</span>
             <span>42 minutes ago</span>
             <span className="text-green-400">Up 42 minutes</span>
-            <span>0.0.0.0:3000->3000/tcp</span>
+            <span>{'0.0.0.0:3000->3000/tcp'}</span>
             <span>ankit-portfolio</span>
         </div>
         <div className="text-slate-300 min-w-[800px] grid grid-cols-[120px_150px_200px_150px_150px_150px_1fr] opacity-70">
