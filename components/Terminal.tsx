@@ -23,6 +23,10 @@ const Terminal: React.FC<TerminalProps> = ({ onClose, onMinimize, isMinimized = 
     return wasBooted ? 'shell' : 'static';
   });
   
+  const [isMinimizing, setIsMinimizing] = useState(false);
+  const [isMaximizing, setIsMaximizing] = useState(false);
+  const prevMinimizedRef = React.useRef(isMinimized);
+  
   const [lines, setLines] = useState<TerminalLine[]>(() => {
     // Don't restore lines from localStorage - they contain React elements that can't be serialized
     // Just show welcome message if terminal was previously booted
@@ -73,6 +77,24 @@ const Terminal: React.FC<TerminalProps> = ({ onClose, onMinimize, isMinimized = 
   
   // Don't save lines to localStorage - they contain React elements that can't be serialized
   // The terminal state is preserved by the 'terminal_booted' flag
+  
+  // Handle animation states
+  useEffect(() => {
+    if (!prevMinimizedRef.current && isMinimized) {
+      // Just minimized
+      setIsMinimizing(true);
+      setTimeout(() => {
+        setIsMinimizing(false);
+      }, 400);
+    } else if (prevMinimizedRef.current && !isMinimized) {
+      // Just maximized
+      setIsMaximizing(true);
+      setTimeout(() => {
+        setIsMaximizing(false);
+      }, 400);
+    }
+    prevMinimizedRef.current = isMinimized;
+  }, [isMinimized]);
   
   // Handle close - reset boot state
   const handleClose = () => {
@@ -200,29 +222,40 @@ const Terminal: React.FC<TerminalProps> = ({ onClose, onMinimize, isMinimized = 
       );
   }
 
-  // Minimized state - show small restore button
-  if (isMinimized) {
+  // Minimized state - show small restore button with animation
+  if (isMinimized && !isMinimizing) {
     return (
-      <div className="fixed bottom-6 right-6 z-[100]">
+      <div className="fixed bottom-6 right-6 z-[100] minimize-button-appear">
         <button
           onClick={onMinimize}
-          className="bg-[#1a1b26] border border-[#414868] rounded-lg px-4 py-2 text-sm text-[#a9b1d6] hover:bg-[#24283b] transition-colors flex items-center gap-2 shadow-lg"
+          className="bg-[#1a1b26] border border-[#414868] rounded-lg px-4 py-2 text-sm text-[#a9b1d6] hover:bg-[#24283b] transition-all duration-200 flex items-center gap-2 shadow-xl hover:scale-110 active:scale-95 minimize-button-pulse"
           title="Restore Terminal"
         >
-          <div className="w-2 h-2 rounded-full bg-green-500"></div>
-          <span>Terminal</span>
+          <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse"></div>
+          <span className="font-semibold">Terminal</span>
         </button>
       </div>
     );
   }
 
+  // Determine animation class
+  const animationClass = isMinimizing 
+    ? 'terminal-minimizing' 
+    : isMaximizing 
+      ? 'terminal-maximizing' 
+      : isMinimized 
+        ? 'hidden' 
+        : '';
+
   return (
     <div 
-      className={`fixed z-[100] ${bgColor} ${textColor} font-mono p-4 sm:p-8 overflow-hidden flex flex-col transition-all duration-300 animate-in fade-in zoom-in-95 ${isMaximized ? 'inset-0' : 'inset-0'}`}
+      className={`fixed z-[100] ${bgColor} ${textColor} font-mono p-4 sm:p-8 overflow-hidden flex flex-col ${animationClass} ${isMaximized ? 'inset-0' : 'inset-0'}`}
       onClick={focusInput}
       style={{ 
           fontFamily: "'Fira Code', 'JetBrains Mono', monospace",
-          textShadow: matrixMode ? '0 0 8px rgba(34, 197, 94, 0.8)' : 'none'
+          textShadow: matrixMode ? '0 0 8px rgba(34, 197, 94, 0.8)' : 'none',
+          transformOrigin: isMinimizing || isMaximizing ? 'bottom right' : 'center center',
+          willChange: (isMinimizing || isMaximizing) ? 'transform, opacity' : 'auto'
       }}
     >
       {bsodTriggered && <SystemPanic onReset={() => {
