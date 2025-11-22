@@ -22,11 +22,3 @@ export interface ChatMessage {
   timestamp: Date;
   isStreaming?: boolean;
 }
-
-export interface Song {
-  id: string;
-  title: string;
-  artist: string;
-  duration: string;
-  audioUrl?: string;
-}

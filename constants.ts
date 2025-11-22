@@ -1,4 +1,4 @@
-import { Project, Experience, Song } from './types';
+import { Project, Experience } from './types';
 
 export const SKILLS = [
   "C++", "JavaScript", "HTML", "Spring Boot", "Flutter", "AWS", "Material UI", "Data Structures", "Algorithms", "Competitive Programming"
@@ -85,30 +85,6 @@ export const PROJECTS: Project[] = [
     description: "High-performance data pipeline fetching social feeds. Optimized schemas to reduce load times by 88% (2.5s to 300ms).",
     tags: ["BigTable", "DataFlow", "API Integration", "Optimization"],
     imageUrl: "https://picsum.photos/600/400?random=12",
-  }
-];
-
-export const SONGS: Song[] = [
-  {
-    id: "s1",
-    title: "Shape of You (Cover)",
-    artist: "Ankit Kumar",
-    duration: "3:53",
-    audioUrl: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3"
-  },
-  {
-    id: "s2",
-    title: "Kesariya (Acoustic)",
-    artist: "Ankit Kumar",
-    duration: "4:15",
-    audioUrl: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3"
-  },
-  {
-    id: "s3",
-    title: "Believer (Live)",
-    artist: "Ankit Kumar",
-    duration: "3:36",
-    audioUrl: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-3.mp3"
   }
 ];
 
