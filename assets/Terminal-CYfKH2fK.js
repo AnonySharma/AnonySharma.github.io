@@ -1,4 +1,4 @@
-import{E as q,P as V,j as e,C as U}from"./index-BC4uZnTz.js";import{r as x,h as B,W as Y,i as X,j as J,k as Q,l as Z,X as ee,T as te,m as se,R as v,n as ne}from"./icons-vendor-Dw6EnsV_.js";import"./react-vendor-Bzgz95E1.js";const ae=()=>x.useMemo(()=>{const a=q.map(r=>`[${r.period}] ${r.role} @ ${r.company}
+import{E as q,P as V,j as e,C as U}from"./index-CcM3InOB.js";import{r as x,h as B,W as Y,i as X,j as J,k as Q,l as Z,X as ee,T as te,m as se,R as v,n as ne}from"./icons-vendor-Dw6EnsV_.js";import"./react-vendor-Bzgz95E1.js";const ae=()=>x.useMemo(()=>{const a=q.map(r=>`[${r.period}] ${r.role} @ ${r.company}
 Location: ${r.location}
 ${r.description.map(c=>`  - ${c}`).join(`
 `)}

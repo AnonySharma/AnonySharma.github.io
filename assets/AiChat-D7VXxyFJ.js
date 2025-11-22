@@ -1,4 +1,4 @@
-import{A as N,S as k,E,P as C,j as e}from"./index-BC4uZnTz.js";import{r,S as j,X as v,e as P,f as R,g as z}from"./icons-vendor-Dw6EnsV_.js";import{G as T}from"./genai-vendor-DOBy76H9.js";import"./react-vendor-Bzgz95E1.js";let x=null;const D=()=>`
+import{A as N,S as k,E,P as C,j as e}from"./index-CcM3InOB.js";import{r,S as j,X as v,e as P,f as R,g as z}from"./icons-vendor-Dw6EnsV_.js";import{G as T}from"./genai-vendor-DOBy76H9.js";import"./react-vendor-Bzgz95E1.js";let x=null;const D=()=>`
     You are the AI digital avatar of Ankit Kumar. You are currently living on his portfolio website.
     Your goal is to answer questions from recruiters, hiring managers, or visitors about Ankit's background, skills, and professional experience.
     
