@@ -370,7 +370,7 @@ const Terminal: React.FC<TerminalProps> = ({ onClose, onMinimize, isMinimized = 
                 )
             } else {
                 return (
-                    <div key={i} className="mb-2 ml-1 font-mono text-sm sm:text-base">
+                    <div key={i} className="mb-2 ml-2 pl-4 border-l-2 border-slate-800/50 font-mono text-sm sm:text-base hover:border-slate-700 transition-colors">
                         {line.content}
                     </div>
                 )

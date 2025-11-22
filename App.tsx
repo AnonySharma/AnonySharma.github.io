@@ -196,11 +196,11 @@ function HomePage() {
       <Screensaver />
       <main>
         <Hero />
-        <About />
         <Skills />
         <Projects />
         <CodeSnippets />
         <Testimonials />
+        <About />
         <Contact />
       </main>
     </div>

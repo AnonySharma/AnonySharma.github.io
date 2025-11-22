@@ -219,8 +219,7 @@ export const SingPlayer: React.FC<{ onFinish: () => void }> = ({ onFinish }) => 
   ];
 
   useEffect(() => {
-    const songUrl = "https://dn710705.ca.archive.org/0/items/Rick_Astley_Never_Gonna_Give_You_Up/Rick_Astley_Never_Gonna_Give_You_Up.ogv";
-    const audio = new Audio(songUrl);
+    const audio = new Audio("/assets/sounds/rickroll.mp3");
     audioRef.current = audio;
     audio.volume = 0.6;
     

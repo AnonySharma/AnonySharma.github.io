@@ -67,7 +67,7 @@ export const SysInfoOutput = () => {
         <span className="text-slate-500 text-xs">IP: 127.0.0.1 (Localhost)</span>
     </div>
   </div>
-  );
+);
 };
 
 export const NeofetchOutput = () => (

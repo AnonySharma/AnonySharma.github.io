@@ -68,7 +68,7 @@ const Achievements: React.FC = () => {
       
       const timer = setTimeout(() => {
         setCurrentNotification(null);
-      }, 5000);
+      }, 8000);
       
       return () => clearTimeout(timer);
     }
@@ -188,8 +188,8 @@ const Achievements: React.FC = () => {
 
       {/* New Achievement Notification */}
       {currentNotification && (
-        <div className="fixed top-20 right-6 z-50 animate-in slide-in-from-right">
-          <div className="bg-gradient-to-r from-yellow-500 to-orange-500 text-white p-4 rounded-lg shadow-xl border-2 border-yellow-300">
+        <div className="fixed top-20 right-6 z-[9999] animate-in slide-in-from-right pointer-events-none">
+          <div className="bg-gradient-to-r from-yellow-500 to-orange-500 text-white p-4 rounded-lg shadow-xl border-2 border-yellow-300 pointer-events-auto">
             <div className="flex items-center gap-3">
               <Trophy size={32} />
               <div>
