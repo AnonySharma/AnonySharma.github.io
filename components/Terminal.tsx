@@ -229,7 +229,7 @@ const Terminal: React.FC<TerminalProps> = ({ onClose, onMinimize, isMinimized = 
     // Cmd+C: Copy (Native browser behavior)
     if (e.key === 'c' && e.metaKey) {
         // Allow default copy behavior
-        return;
+         return;
     }
 
     if (e.key === 'Enter') {

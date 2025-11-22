@@ -340,14 +340,12 @@ export const AchievementProvider: React.FC<{ children: ReactNode }> = ({ childre
 
   // Check for new unlocks when stats change
   useEffect(() => {
-    let newUnlock = false;
     const newUnlockedIds = [...unlockedIds];
 
     ACHIEVEMENTS_DATA.forEach(data => {
       if (!newUnlockedIds.includes(data.id)) {
         if (checkCondition(data.id, stats)) {
           newUnlockedIds.push(data.id);
-          newUnlock = true;
           
           // Special handling for notification priority
           if (data.id === 'error_catcher') {
@@ -357,12 +355,17 @@ export const AchievementProvider: React.FC<{ children: ReactNode }> = ({ childre
       }
     });
 
-    if (newUnlock) {
+    // Calculate newly unlocked achievements (ones not in the original unlockedIds)
+    const newlyUnlockedIds = newUnlockedIds.filter(id => !unlockedIds.includes(id));
+
+    if (newlyUnlockedIds.length > 0) {
       setUnlockedIds(newUnlockedIds);
       localStorage.setItem('portfolio_achievements', JSON.stringify(newUnlockedIds));
       
-      // Dispatch event for the notification component
-      window.dispatchEvent(new Event('achievementsUnlocked'));
+      // Dispatch event with details about newly unlocked achievements
+      window.dispatchEvent(new CustomEvent('achievementsUnlocked', { 
+        detail: { newlyUnlockedIds } 
+      }));
       
       // Check for 100% completion (all achievements unlocked)
       if (newUnlockedIds.length === ACHIEVEMENTS_DATA.length) {

@@ -53,6 +53,10 @@ Spoilers ahead! This guide reveals how to unlock every single achievement in the
 | **Cowsay User** | 🐄 | Type `cowsay hello` in the terminal. |
 | **BSOD Trigger** | 💀 | Type `bsod`, `rm -rf /`, or `sudo rm -rf /` in the terminal. |
 | **Error Catcher** | 🚨 | Trigger an error toast (e.g. click a project card repeatedly/quickly until it simulates an error). |
+| **Touch Grass** | 🌿 | Type `touch grass` in the terminal. |
+| **Yeet Terminal** | 👋 | Type `yeet` in the terminal. |
+| **Stonks** | 📈 | Type `stonks` in the terminal (50/50 chance of profit). |
+| **Incognito** | 🕵️ | Type `incognito` in the terminal to go dark. |
 | **Easter Egg Hunter** | 🥚 | Unlock all the "Fun & Random" achievements listed above (+ Konami + Screensaver + Corner Hit + Barrel Roll). |
 | **Night Owl** | 🦉 | Visit the website between 12:00 AM and 2:00 AM. |
 

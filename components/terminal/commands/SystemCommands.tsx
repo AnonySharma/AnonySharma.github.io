@@ -332,3 +332,293 @@ export const DockerRunOutput: React.FC<{ image: string }> = ({ image }) => {
         </div>
     );
 };
+
+// Skills Output Component
+export const SkillsOutput: React.FC<{ args: string[], skills: string[] }> = ({ args, skills }) => {
+    const skillLevels: { [key: string]: number } = {
+        "C++": 90,
+        "JavaScript": 85,
+        "HTML": 80,
+        "Spring Boot": 75,
+        "Flutter": 70,
+        "AWS": 65,
+        "Material UI": 60,
+        "Data Structures": 95,
+        "Algorithms": 95,
+        "Competitive Programming": 90
+    };
+
+    if (args[0] === '--graph' || args[0] === '-g') {
+        const maxLength = Math.max(...skills.map(s => s.length));
+        return (
+            <div className="font-mono text-sm space-y-1">
+                <div className="text-green-400 mb-2">Skills Proficiency Graph:</div>
+                {skills.map((skill, idx) => {
+                    const level = skillLevels[skill] || 70;
+                    const barLength = Math.floor(level / 5);
+                    const bar = '█'.repeat(barLength) + '░'.repeat(20 - barLength);
+                    return (
+                        <div key={idx} className="flex items-center gap-2">
+                            <span className="text-cyan-400 w-32">{skill.padEnd(maxLength)}</span>
+                            <span className="text-yellow-400">{bar}</span>
+                            <span className="text-green-400">{level}%</span>
+                        </div>
+                    );
+                })}
+                <div className="text-slate-500 text-xs mt-2">Note: These percentages are completely made up. But I'm good at them! 😎</div>
+            </div>
+        );
+    } else if (args[0] === '--level' || args[0] === '-l') {
+        const maxLength = Math.max(...skills.map(s => s.length));
+        return (
+            <div className="font-mono text-sm space-y-1">
+                <div className="text-green-400 mb-2">Skills with Proficiency Levels:</div>
+                {skills.map((skill, idx) => {
+                    const level = skillLevels[skill] || 70;
+                    const levelText = level >= 90 ? 'Expert' : level >= 75 ? 'Advanced' : level >= 60 ? 'Intermediate' : 'Beginner';
+                    const levelColor = level >= 90 ? 'text-green-400' : level >= 75 ? 'text-yellow-400' : level >= 60 ? 'text-cyan-400' : 'text-slate-400';
+                    return (
+                        <div key={idx} className="flex items-center gap-2">
+                            <span className="text-cyan-400 w-40">{skill.padEnd(maxLength)}</span>
+                            <span className={`${levelColor} font-bold`}>{levelText}</span>
+                            <span className="text-slate-500">({level}%)</span>
+                        </div>
+                    );
+                })}
+                <div className="text-slate-500 text-xs mt-2">Use 'skills --graph' for a visual bar representation</div>
+            </div>
+        );
+    } else {
+        return (
+            <div className="font-mono text-sm">
+                <div className="text-green-400 mb-2">Available Skills:</div>
+                <div className="text-cyan-400">{skills.join(', ')}</div>
+                <div className="text-slate-500 text-xs mt-2">Use 'skills --graph' for a visual representation</div>
+                <div className="text-slate-500 text-xs">Use 'skills --level' to see proficiency levels</div>
+            </div>
+        );
+    }
+};
+
+// Resume Output Component
+export const ResumeOutput: React.FC = () => {
+    return (
+        <div className="font-mono text-sm space-y-2">
+            <div className="text-green-400">═══════════════════════════════════════════════════════</div>
+            <div className="text-white font-bold text-lg">ANKIT KUMAR</div>
+            <div className="text-cyan-400">Member of Technical Staff @ Salesforce</div>
+            <div className="text-slate-400">═══════════════════════════════════════════════════════</div>
+            
+            <div className="text-yellow-400 mt-4 font-bold">EDUCATION</div>
+            <div className="text-white">IIT (BHU) Varanasi - B.Tech CSE (2019-2023)</div>
+            <div className="text-slate-400">Rank 61 - ICPC Regionals</div>
+            
+            <div className="text-yellow-400 mt-4 font-bold">EXPERIENCE</div>
+            <div className="text-white">Member of Technical Staff @ Salesforce (Aug 2025 - Present)</div>
+            <div className="text-slate-400">  • Working with cutting-edge enterprise cloud solutions</div>
+            <div className="text-white">Associate MTS @ Salesforce (June 2023 - Aug 2025)</div>
+            <div className="text-slate-400">  • Contributed to core platform development</div>
+            <div className="text-white">Full Stack Developer @ Scapia (Dec 2022 - April 2023)</div>
+            <div className="text-slate-400">  • Travel-Now-Pay-Later vertical (Spring Boot + Flutter)</div>
+            
+            <div className="text-yellow-400 mt-4 font-bold">SKILLS</div>
+            <div className="text-cyan-400">C++, JavaScript, HTML, Spring Boot, Flutter, AWS, Material UI</div>
+            
+            <div className="text-yellow-400 mt-4 font-bold">CONTACT</div>
+            <div className="text-white">Email: cgankitsharma@gmail.com</div>
+            <div className="text-white">LinkedIn: linkedin.com/in/cgankitsharma</div>
+            <div className="text-white">GitHub: github.com/AnonySharma</div>
+            
+            <div className="text-green-400 mt-4">═══════════════════════════════════════════════════════</div>
+            <div className="text-slate-500 text-xs">Type 'download resume' or click the download button for PDF version</div>
+        </div>
+    );
+};
+
+// History Output Component
+export const HistoryOutput: React.FC<{ commandHistory: string[] }> = ({ commandHistory }) => {
+    if (commandHistory.length === 0) {
+        return <span className="text-slate-500">No commands in history yet.</span>;
+    }
+    
+    return (
+        <div className="font-mono text-sm space-y-1">
+            <div className="text-green-400 font-bold mb-2">Command History ({commandHistory.length} commands):</div>
+            <div className="max-h-64 overflow-y-auto custom-scrollbar">
+                {commandHistory.map((cmd, idx) => (
+                    <div key={idx} className="flex items-start gap-3 text-slate-300">
+                        <span className="text-slate-600 text-xs w-8 flex-shrink-0">{idx + 1}</span>
+                        <span className="flex-1">{cmd}</span>
+                    </div>
+                ))}
+            </div>
+            <div className="text-slate-500 text-xs mt-2">Use ↑/↓ arrow keys to navigate history</div>
+        </div>
+    );
+};
+
+// Tree Output Component
+export const TreeOutput: React.FC<{ fileSystem: any }> = ({ fileSystem }) => {
+    const buildTree = (node: any, prefix: string = '', isLast: boolean = true, depth: number = 0, nodeName: string = '~'): string[] => {
+        if (depth > 5) return [];
+        const lines: string[] = [];
+        const connector = isLast ? '└── ' : '├── ';
+        lines.push(prefix + connector + nodeName);
+        
+        if (node.type === 'dir' && node.children) {
+            const children = Object.entries(node.children);
+            children.forEach(([childName, childNode]: [string, any], index) => {
+                const isLastChild = index === children.length - 1;
+                const newPrefix = prefix + (isLast ? '    ' : '│   ');
+                lines.push(...buildTree(childNode, newPrefix, isLastChild, depth + 1, childName));
+            });
+        }
+        return lines;
+    };
+    
+    const rootNode = fileSystem['~'];
+    if (rootNode) {
+        const treeLines = buildTree(rootNode);
+        return (
+            <pre className="font-mono text-sm text-green-400 whitespace-pre overflow-x-auto">
+                {treeLines.join('\n')}
+            </pre>
+        );
+    } else {
+        return <span className="text-red-400">tree: cannot access filesystem</span>;
+    }
+};
+
+// Help Output Component
+export const HelpOutput: React.FC<{ commands: Array<{ name: string; description: string; category?: string; aliases?: string[] }> }> = ({ commands }) => {
+    const uniqueCommands = commands.filter((cmd, index, self) => 
+        index === self.findIndex(c => c.name === cmd.name)
+    );
+    
+    // Group commands by category
+    const commandsByCategory = uniqueCommands.reduce((acc, cmd) => {
+        const category = cmd.category || 'other';
+        if (!acc[category]) {
+            acc[category] = [];
+        }
+        acc[category].push(cmd);
+        return acc;
+    }, {} as Record<string, typeof uniqueCommands>);
+    
+    // Category display names
+    const categoryNames: Record<string, string> = {
+        'file': '📁 File System',
+        'system': '⚙️  System',
+        'info': 'ℹ️  Information',
+        'network': '🌐 Network',
+        'terminal': '💻 Terminal',
+        'fun': '🎮 Fun & Easter Eggs',
+        'other': '📋 Other'
+    };
+    
+    // Category order
+    const categoryOrder = ['file', 'system', 'info', 'network', 'terminal', 'fun', 'other'];
+    
+    return (
+        <div className="opacity-80 max-w-xl font-mono text-sm space-y-4">
+            {categoryOrder.map((category) => {
+                const categoryCommands = commandsByCategory[category];
+                if (!categoryCommands || categoryCommands.length === 0) return null;
+                
+                return (
+                    <div key={category} className="space-y-1">
+                        <div className="text-cyan-400 font-bold text-xs uppercase tracking-wider mb-2 border-b border-slate-700 pb-1">
+                            {categoryNames[category] || category}
+                        </div>
+                        {categoryCommands.sort((a, b) => a.name.localeCompare(b.name)).map((cmd) => (
+                            <div key={cmd.name} className="flex items-start gap-3 ml-2">
+                                <div className="w-32 flex-shrink-0">
+                                    <span className="text-yellow-400 font-bold">{cmd.name}</span>
+                                    {cmd.aliases && cmd.aliases.length > 0 && (
+                                        <span className="text-slate-500 text-xs ml-1">
+                                            ({cmd.aliases.join(', ')})
+                                        </span>
+                                    )}
+                                </div>
+                                <span className="text-slate-300 flex-1">{cmd.description}</span>
+                            </div>
+                        ))}
+                    </div>
+                );
+            })}
+        </div>
+    );
+};
+
+// Whoami Output Component
+export const WhoamiOutput: React.FC = () => {
+    const whoamiResponses = [
+        "visitor",
+        "visitor",
+        "visitor",
+        "visitor",
+        "visitor",
+        "visitor",
+        "visitor",
+        "visitor",
+        "I don't know, who are YOU?",
+        "A figment of my simulation.",
+        <span key="error" className="text-red-400">System.User.NullReferenceException</span>,
+        "Batman 🦇",
+        "The one who knocks.",
+        "Just another brick in the wall."
+    ];
+    const randomResponse = whoamiResponses[Math.floor(Math.random() * whoamiResponses.length)];
+    return <>{randomResponse}</>;
+};
+
+// Date Output Component
+export const DateOutput: React.FC = () => {
+    return <span className="text-slate-300">{new Date().toString()}</span>;
+};
+
+// Who Output Component
+export const WhoOutput: React.FC = () => {
+    return <span className="text-slate-300">visitor  pts/0  {new Date().toLocaleTimeString()} ({navigator.userAgent.includes('Mac') ? 'Mac' : 'PC'})</span>;
+};
+
+// Reboot Output Component
+export const RebootOutput: React.FC = () => {
+    return <span className="text-yellow-400">System reboot initiated...</span>;
+};
+
+// Screensaver Output Component
+export const ScreensaverOutput: React.FC = () => {
+    return <span className="text-green-400">Initializing Sleep Mode...</span>;
+};
+
+// DevMode Unlock Output Component
+export const DevModeUnlockOutput: React.FC = () => {
+    return (
+        <div className="font-mono text-sm space-y-2">
+            <div className="text-green-400 font-bold">✓ Achievements panel unlocked!</div>
+            <div className="text-slate-400 text-xs">The achievements button is now visible in the bottom-left corner.</div>
+            <div className="text-slate-400 text-xs">This will persist across future visits.</div>
+        </div>
+    );
+};
+
+// Docker Usage Output Component
+export const DockerUsageOutput: React.FC = () => {
+    return <span className="text-slate-400">Usage: docker [ps | images | run &lt;image&gt;]</span>;
+};
+
+// Docker Error Output Component
+export const DockerErrorOutput: React.FC<{ command: string }> = ({ command }) => {
+    return <span className="text-red-400">docker: '{command}' is not a docker command.</span>;
+};
+
+// Type Game Score Output Component
+export const TypeGameScoreOutput: React.FC<{ score: string }> = ({ score }) => {
+    return <span className="text-green-400">{score}</span>;
+};
+
+// Game Over Score Output Component
+export const GameOverScoreOutput: React.FC<{ score: number }> = ({ score }) => {
+    return <span className="text-green-400">Game Over! Score: {score}</span>;
+};

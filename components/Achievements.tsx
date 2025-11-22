@@ -33,29 +33,37 @@ const Achievements: React.FC = () => {
     };
   }, []);
 
-  // Effect to detect new unlocks and add to queue
+  // Effect to detect new unlocks and add to queue (backup method)
   useEffect(() => {
-    const unnotified = achievements.filter(
-      a => a.unlocked && !localStorage.getItem(`notified_${a.id}`)
-    );
+    const prevCount = parseInt(localStorage.getItem('prev_achievement_count') || '0', 10);
+    
+    // Only process if there are new unlocks
+    if (unlockedCount > prevCount) {
+      // Small delay to let event listener handle it first
+      const timeoutId = setTimeout(() => {
+        const newlyUnlocked = achievements.filter(
+          a => a.unlocked && !localStorage.getItem(`notified_${a.id}`)
+        );
 
-    if (unnotified.length > 0) {
-      const newIds = unnotified.map(a => a.id);
+        if (newlyUnlocked.length > 0) {
+          const newIds = newlyUnlocked.map(a => a.id);
+          
+          setNotificationQueue(prev => {
+            // Filter out IDs that are already in the queue or currently being shown
+            const uniqueNew = newIds.filter(id => !prev.includes(id) && id !== currentNotification);
+            if (uniqueNew.length === 0) return prev;
+            
+            // Mark as notified
+            uniqueNew.forEach(id => localStorage.setItem(`notified_${id}`, 'true'));
+            return [...prev, ...uniqueNew];
+          });
+        }
+      }, 200);
       
-      setNotificationQueue(prev => {
-        // Filter out IDs that are already in the queue or currently being shown
-        const uniqueNew = newIds.filter(id => !prev.includes(id) && id !== currentNotification);
-        if (uniqueNew.length === 0) return prev;
-        return [...prev, ...uniqueNew];
-      });
-
-      // Mark as notified immediately to avoid re-adding
-      newIds.forEach(id => localStorage.setItem(`notified_${id}`, 'true'));
-      
-      // Clean up any manual override marker if it exists
-      localStorage.removeItem('last_unlocked_achievement');
-      
+      // Update the previous count
       localStorage.setItem('prev_achievement_count', unlockedCount.toString());
+      
+      return () => clearTimeout(timeoutId);
     }
   }, [achievements, unlockedCount, currentNotification]);
 
@@ -68,11 +76,37 @@ const Achievements: React.FC = () => {
       
       const timer = setTimeout(() => {
         setCurrentNotification(null);
-      }, 8000);
+      }, 4000); // Reduced from 8 seconds to 4 seconds
       
       return () => clearTimeout(timer);
     }
   }, [notificationQueue, currentNotification]);
+
+  // Listen for achievement unlock events (primary method)
+  useEffect(() => {
+    const handleAchievementUnlock = (event: Event) => {
+      const customEvent = event as CustomEvent<{ newlyUnlockedIds?: string[] }>;
+      const newlyUnlockedIds = customEvent.detail?.newlyUnlockedIds;
+      
+      if (newlyUnlockedIds && newlyUnlockedIds.length > 0) {
+        // Add newly unlocked achievements to queue immediately
+        setNotificationQueue(prev => {
+          const uniqueNew = newlyUnlockedIds.filter(
+            id => !prev.includes(id) && id !== currentNotification && !localStorage.getItem(`notified_${id}`)
+          );
+          if (uniqueNew.length === 0) return prev;
+          
+          // Mark as notified to prevent duplicates
+          uniqueNew.forEach(id => localStorage.setItem(`notified_${id}`, 'true'));
+          
+          return [...prev, ...uniqueNew];
+        });
+      }
+    };
+    
+    window.addEventListener('achievementsUnlocked', handleAchievementUnlock);
+    return () => window.removeEventListener('achievementsUnlocked', handleAchievementUnlock);
+  }, [currentNotification]);
 
   const unlocked = achievements.filter(a => a.unlocked);
   const locked = achievements.filter(a => !a.unlocked);

@@ -19,6 +19,18 @@
   pointer-events: none;
 }
 
+/* Incognito Mode */
+.incognito-mode {
+  filter: grayscale(100%) contrast(1.2) brightness(0.8);
+  background-color: #000 !important;
+  border-color: #333 !important;
+}
+
+.incognito-mode * {
+  color: #bbb !important;
+  text-shadow: none !important;
+}
+
 /* Terminal-specific scrollbar */
 .custom-scrollbar::-webkit-scrollbar {
   width: 8px;

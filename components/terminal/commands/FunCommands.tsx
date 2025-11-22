@@ -742,3 +742,173 @@ export const SystemPanic: React.FC<{ onReset: () => void }> = ({ onReset }) => {
         </div>
     );
 };
+
+// Joke Output Component
+export const JokeOutput: React.FC = () => {
+    const jokes = [
+        "Why do programmers prefer dark mode? Because light attracts bugs.",
+        "How many programmers does it take to change a light bulb? None, that's a hardware problem.",
+        "I told my wife she was drawing her eyebrows too high. She looked surprised.",
+        "There are 10 types of people in the world: Those who understand binary, and those who don't."
+    ];
+    const randomJoke = jokes[Math.floor(Math.random() * jokes.length)];
+    return <span className="text-cyan-300">{randomJoke}</span>;
+};
+
+// Answer 42 Output Component
+export const Answer42Output: React.FC = () => {
+    return <span className="text-green-400">The Answer to the Ultimate Question of Life, the Universe, and Everything.</span>;
+};
+
+// Whois Output Component
+export const WhoisOutput: React.FC<{ args: string[] }> = ({ args }) => {
+    const subArg = args[0]?.toLowerCase();
+    
+    if (!subArg || subArg === 'ankit') {
+        return (
+            <div className="border border-green-500 p-2 text-green-500 font-mono">
+                NAME: Ankit Kumar<br />
+                CLASS: S-Tier Developer<br />
+                SPECIALTY: Turning Coffee into Code<br />
+                STATUS: Online & Ready to Hire<br />
+                <span className="text-slate-500 text-xs mt-1">Try 'whois cse' or 'whois salesforce' for more.</span>
+            </div>
+        );
+    } else if (['salesforce', 'sf', 'work'].includes(subArg)) {
+        return (
+            <div className="text-blue-400 font-mono">
+                <div className="font-bold border-b border-blue-500 mb-1">SALESFORCE IDENTITY</div>
+                <div>ROLE: Member of Technical Staff (MTS)</div>
+                <div>TENURE: Aug 2025 - Present</div>
+                <div>PREVIOUS: Associate MTS (2023-2025)</div>
+                <div>MISSION: Building enterprise cloud solutions at scale.</div>
+            </div>
+        );
+    } else if (['cse', 'college', 'iit', 'bhu'].includes(subArg)) {
+        return (
+            <div className="text-yellow-400 font-mono">
+                <div className="font-bold border-b border-yellow-500 mb-1">ACADEMIC RECORDS</div>
+                <div>INSTITUTE: IIT (BHU) Varanasi</div>
+                <div>DEGREE: B.Tech in Computer Science & Engineering</div>
+                <div>CLASS: 2023</div>
+                <div>ACHIEVEMENTS: ICPC Regionalist (Rank 61), Design Head (Codefest).</div>
+            </div>
+        );
+    } else if (['linkedin', 'social'].includes(subArg)) {
+        return (
+            <div>
+                Find me on LinkedIn: <a href="https://www.linkedin.com/in/cgankitsharma/" target="_blank" className="text-blue-400 underline">cgankitsharma</a>
+            </div>
+        );
+    } else {
+        return <span className="text-slate-400">Unknown user or entity: {subArg}. Try 'ankit', 'salesforce', or 'cse'.</span>;
+    }
+};
+
+// Easter Eggs Output Component
+export const EasterEggsOutput: React.FC<{ commands: Array<{ name: string; category?: string; aliases?: string[] }> }> = ({ commands }) => {
+    const easterEggCommands = commands
+        .filter(cmd => cmd.category === 'fun')
+        .map(cmd => {
+            if (cmd.aliases && cmd.aliases.length > 0) {
+                return `${cmd.name} / ${cmd.aliases.join(' / ')}`;
+            }
+            return cmd.name;
+        });
+    
+    const specialCommands = ['sysinfo', 'neofetch', 'top', 'ping', 'rm -rf /'];
+    const allEasterEggs = [...easterEggCommands, ...specialCommands].sort();
+    
+    return (
+        <div className="grid grid-cols-2 gap-2 text-xs sm:text-sm font-mono text-purple-400">
+            {allEasterEggs.map((cmd, idx) => (
+                <div key={idx}>{cmd}</div>
+            ))}
+        </div>
+    );
+};
+
+// Stonks Output Component
+export const StonksOutput: React.FC = () => {
+    const isUp = Math.random() > 0.5;
+    const stonkChartUp = `
+        ▲  
+        |      /\\  
+        |   /\\/  \\    /\\
+    70$ |  /      \\  /  \\      /
+        | /        \\/    \\    /
+        |/                \\  /
+    10$ |                  \\/
+        +---------------------------->
+    `;
+    const stonkChartDown = `
+    70$ +--\\
+        |   \\      /\\
+        |    \\    /  \\    /
+        |     \\/\\/    \\  /
+    10$ |              \\/
+        |                  
+        +---------------------------->
+    `;
+    
+    if (isUp) {
+        return <pre className="text-green-400 font-mono whitespace-pre">{stonkChartUp} <br/>Crypto portfolio: +10000% 🚀 (To the moon!)</pre>;
+    } else {
+        return <pre className="text-red-400 font-mono whitespace-pre">{stonkChartDown} <br/>Crypto portfolio: -99.9% 📉 (Buy the dip?)</pre>;
+    }
+};
+
+// Weather Output Component
+export const WeatherOutput: React.FC = () => {
+    return <span className="text-blue-300">Current weather in Server Room: 21°C, 0% chance of sunlight, 100% chance of bugs.</span>;
+};
+
+// Coinflip Output Component
+export const CoinflipOutput: React.FC = () => {
+    const result = Math.random() > 0.5 ? 'HEADS' : 'TAILS';
+    return <span className="font-bold text-yellow-400">{result}</span>;
+};
+
+// Yeet Output Component
+export const YeetOutput: React.FC = () => {
+    return <span className="text-yellow-400">YEET! 👋</span>;
+};
+
+// Incognito Output Components
+export const IncognitoOnOutput: React.FC = () => {
+    return <span className="text-slate-500">Going dark... (Incognito Mode Active)</span>;
+};
+
+export const IncognitoOffOutput: React.FC = () => {
+    return <span className="text-green-400">Welcome back to the grid.</span>;
+};
+
+// Touch Grass Output Component
+export const TouchGrassOutput: React.FC = () => {
+    return <span className="text-green-500">System overheating. User needs sunlight. Opening maps...</span>;
+};
+
+// Touch Error Output Component
+export const TouchErrorOutput: React.FC = () => {
+    return <span className="text-pink-400">Hey! Don't touch me! 😡</span>;
+};
+
+// Sudo Sandwich Output Component
+export const SudoSandwichOutput: React.FC = () => {
+    return <span className="text-green-400">Okay. 🥪</span>;
+};
+
+// Sudo Permission Denied Output Component
+export const SudoPermissionDeniedOutput: React.FC = () => {
+    return <span className="text-red-400 font-bold">Permission denied: You are not in the sudoers file. This incident will be reported.</span>;
+};
+
+// Vim Output Component
+export const VimOutput: React.FC = () => {
+    return <span className="text-yellow-400">Vim/Emacs not found. To exit this thought loop, simply click the close button on the top right.</span>;
+};
+
+// Open Success Output Component
+export const OpenSuccessOutput: React.FC<{ fileName: string }> = ({ fileName }) => {
+    return <span className="text-green-400">Opening {fileName}...</span>;
+};
