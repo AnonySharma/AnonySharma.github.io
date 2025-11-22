@@ -29,11 +29,11 @@ const NotFound: React.FC = () => {
   const [glitchActive, setGlitchActive] = useState(false);
   const [showEasterEgg, setShowEasterEgg] = useState(false);
   const excuseRef = useRef<HTMLDivElement>(null);
-  const { unlockAchievement } = useAchievements();
+  const { unlockAchievement, trackEvent } = useAchievements();
 
   // Track 404 visit for achievement
   useEffect(() => {
-    localStorage.setItem('visited_404', 'true');
+    trackEvent('visited_404', true);
   }, []);
 
   const handleNewExcuse = useCallback(() => {
@@ -89,10 +89,8 @@ const NotFound: React.FC = () => {
       }
       if (konamiCode === konamiSequence) {
         setShowEasterEgg(true);
-        localStorage.setItem('konami_unlocked', 'true');
-        localStorage.setItem('developer_mode', 'true');
-        unlockAchievement('konami_master');
-        unlockAchievement('developer_mode');
+        trackEvent('konami_unlocked', true);
+        trackEvent('developer_mode', true);
         setTimeout(() => setShowEasterEgg(false), 5000);
         konamiCode = '';
       }

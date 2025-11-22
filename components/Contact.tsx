@@ -20,7 +20,16 @@ const Contact: React.FC = () => {
                 </div>
                 <div>
                   <p className="text-sm text-slate-500">Email</p>
-                  <a href={`mailto:${CONTACT_INFO.email}`} className="font-medium hover:text-primary transition-colors">{CONTACT_INFO.email}</a>
+                  <a 
+                    href={`mailto:${CONTACT_INFO.email}`} 
+                    className="font-medium hover:text-primary transition-colors"
+                    onClick={() => {
+                      localStorage.setItem('social_email_clicked', 'true');
+                      window.dispatchEvent(new Event('socialLinkClicked'));
+                    }}
+                  >
+                    {CONTACT_INFO.email}
+                  </a>
                 </div>
               </div>
               
@@ -40,7 +49,18 @@ const Contact: React.FC = () => {
                  </div>
                  <div>
                    <p className="text-sm text-slate-500">LinkedIn</p>
-                   <a href={CONTACT_INFO.linkedin} target="_blank" rel="noopener noreferrer" className="font-medium hover:text-primary transition-colors">{CONTACT_INFO.linkedinHandle}</a>
+                   <a 
+                     href={CONTACT_INFO.linkedin} 
+                     target="_blank" 
+                     rel="noopener noreferrer" 
+                     className="font-medium hover:text-primary transition-colors"
+                     onClick={() => {
+                       localStorage.setItem('social_linkedin_clicked', 'true');
+                       window.dispatchEvent(new Event('socialLinkClicked'));
+                     }}
+                   >
+                     {CONTACT_INFO.linkedinHandle}
+                   </a>
                  </div>
                </div>
             </div>

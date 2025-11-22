@@ -5,7 +5,8 @@ import { useAchievements } from '../contexts/AchievementContext';
 const Achievements: React.FC = () => {
   const { achievements, unlockedCount } = useAchievements();
   const [isOpen, setIsOpen] = useState(false);
-  const [newUnlock, setNewUnlock] = useState<string | null>(null);
+  const [notificationQueue, setNotificationQueue] = useState<string[]>([]);
+  const [currentNotification, setCurrentNotification] = useState<string | null>(null);
   const [isUnlocked, setIsUnlocked] = useState(() => {
     return localStorage.getItem('achievements_unlocked') === 'true';
   });
@@ -32,18 +33,46 @@ const Achievements: React.FC = () => {
     };
   }, []);
 
+  // Effect to detect new unlocks and add to queue
   useEffect(() => {
-    const prevCount = parseInt(localStorage.getItem('prev_achievement_count') || '0');
-    if (unlockedCount > prevCount) {
-      const newlyUnlocked = achievements.find(a => a.unlocked && !localStorage.getItem(`notified_${a.id}`));
-      if (newlyUnlocked) {
-        setNewUnlock(newlyUnlocked.id);
-        localStorage.setItem(`notified_${newlyUnlocked.id}`, 'true');
-        setTimeout(() => setNewUnlock(null), 5000);
-      }
+    const unnotified = achievements.filter(
+      a => a.unlocked && !localStorage.getItem(`notified_${a.id}`)
+    );
+
+    if (unnotified.length > 0) {
+      const newIds = unnotified.map(a => a.id);
+      
+      setNotificationQueue(prev => {
+        // Filter out IDs that are already in the queue or currently being shown
+        const uniqueNew = newIds.filter(id => !prev.includes(id) && id !== currentNotification);
+        if (uniqueNew.length === 0) return prev;
+        return [...prev, ...uniqueNew];
+      });
+
+      // Mark as notified immediately to avoid re-adding
+      newIds.forEach(id => localStorage.setItem(`notified_${id}`, 'true'));
+      
+      // Clean up any manual override marker if it exists
+      localStorage.removeItem('last_unlocked_achievement');
+      
       localStorage.setItem('prev_achievement_count', unlockedCount.toString());
     }
-  }, [unlockedCount, achievements]);
+  }, [achievements, unlockedCount, currentNotification]);
+
+  // Effect to process the queue
+  useEffect(() => {
+    if (currentNotification === null && notificationQueue.length > 0) {
+      const nextId = notificationQueue[0];
+      setCurrentNotification(nextId);
+      setNotificationQueue(prev => prev.slice(1));
+      
+      const timer = setTimeout(() => {
+        setCurrentNotification(null);
+      }, 5000);
+      
+      return () => clearTimeout(timer);
+    }
+  }, [notificationQueue, currentNotification]);
 
   const unlocked = achievements.filter(a => a.unlocked);
   const locked = achievements.filter(a => !a.unlocked);
@@ -158,7 +187,7 @@ const Achievements: React.FC = () => {
       )}
 
       {/* New Achievement Notification */}
-      {newUnlock && (
+      {currentNotification && (
         <div className="fixed top-20 right-6 z-50 animate-in slide-in-from-right">
           <div className="bg-gradient-to-r from-yellow-500 to-orange-500 text-white p-4 rounded-lg shadow-xl border-2 border-yellow-300">
             <div className="flex items-center gap-3">
@@ -166,7 +195,7 @@ const Achievements: React.FC = () => {
               <div>
                 <div className="font-bold">Achievement Unlocked!</div>
                 <div className="text-sm opacity-90">
-                  {achievements.find(a => a.id === newUnlock)?.name}
+                  {achievements.find(a => a.id === currentNotification)?.name}
                 </div>
               </div>
             </div>

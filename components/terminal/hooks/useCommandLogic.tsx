@@ -6,13 +6,14 @@ import { PingProcess } from '../commands/NetworkCommands';
 import { CowsayOutput, MatrixProcess, SteamLocomotive, CryptoMiner, TypeGame, SingPlayer, FortuneOutput, FireEffect, CoffeeOutput, HackProcess, SnakeGame, PartyParrot } from '../commands/FunCommands';
 import { SyntaxHighlighter } from '../SyntaxHighlighter';
 import { SKILLS } from '../../../constants';
+import { useAchievements } from '../../../contexts/AchievementContext';
 
 // DevMode Status Component with Toggle
 const DevModeStatus: React.FC<{ 
-    isDevMode: boolean; 
     found: Array<{ key: string; name: string }>; 
     easterEggs: Array<{ key: string; name: string }> 
-}> = ({ isDevMode, found, easterEggs }) => {
+}> = ({ found, easterEggs }) => {
+    const { stats } = useAchievements();
     const [achievementsUnlocked, setAchievementsUnlocked] = useState(() => {
         return localStorage.getItem('achievements_unlocked') === 'true';
     });
@@ -35,6 +36,8 @@ const DevModeStatus: React.FC<{
             window.dispatchEvent(new Event('achievementsUnlocked'));
         }
     };
+
+    const isDevMode = !!stats.developer_mode;
 
     return (
         <div className="font-mono text-sm space-y-2">
@@ -99,7 +102,7 @@ export const useCommandLogic = ({
     setInput, setCursorPos,
     onClose, scrollToBottom, fileSystem
 }: CommandLogicProps) => {
-
+    const { trackEvent, stats } = useAchievements();
     const [commandHistory, setCommandHistory] = useState<string[]>([]);
     const [historyIndex, setHistoryIndex] = useState(-1);
 
@@ -177,7 +180,7 @@ export const useCommandLogic = ({
             'cowsay', 'whoami', 'pwd', 'exit', 'sudo', 'rm', 'vim', 'vi', 
             'nano', 'emacs', 'weather', 'coinflip', 'hack', 'coffee', 'brew', 
             'joke', '42', 'eastereggs', 'whois', 'fortune', 'fire', 'docker', 
-            'game', 'party', 'bsod', 'skills', 'resume', 'devmode', 'developer'
+            'game', 'party', 'bsod', 'skills', 'resume', 'devmode', 'developer', 'history', 'tree'
         ];
 
         const args = input.split(' ');
@@ -263,19 +266,19 @@ export const useCommandLogic = ({
         const cmdTrimmed = rawInput.trim();
         if (!cmdTrimmed) return;
 
-        setCommandHistory(prev => [...prev, rawInput]);
+        setCommandHistory(prev => {
+            const newHistory = [...prev, rawInput];
+            // Keep only last 100 commands
+            return newHistory.slice(-100);
+        });
         setHistoryIndex(-1);
 
         const [cmd, ...args] = cmdTrimmed.split(/\s+/);
         
         // Track command usage for achievements
-        const usedCommands = JSON.parse(localStorage.getItem('used_commands') || '[]');
-        if (!usedCommands.includes(cmd.toLowerCase())) {
-            usedCommands.push(cmd.toLowerCase());
-            localStorage.setItem('used_commands', JSON.stringify(usedCommands));
-            const count = parseInt(localStorage.getItem('terminal_commands_used') || '0');
-            localStorage.setItem('terminal_commands_used', (count + 1).toString());
-        }
+        trackEvent('used_commands', cmd.toLowerCase());
+        trackEvent('terminal_commands_used');
+
         const promptLine: TerminalLine = { type: 'input', content: rawInput };
         const newLines: TerminalLine[] = [promptLine];
 
@@ -305,6 +308,8 @@ export const useCommandLogic = ({
                                 <div className="flex"><span className="w-24 text-yellow-400 font-bold">skills</span> <span>Show skills (--graph, --level)</span></div>
                                 <div className="flex"><span className="w-24 text-yellow-400 font-bold">resume</span> <span>Display resume in terminal</span></div>
                                 <div className="flex"><span className="w-24 text-yellow-400 font-bold">devmode</span> <span>Show developer mode status (unlock achievements)</span></div>
+                                <div className="flex"><span className="w-24 text-yellow-400 font-bold">history</span> <span>Show command history</span></div>
+                                <div className="flex"><span className="w-24 text-yellow-400 font-bold">tree</span> <span>Display directory tree structure</span></div>
                                 <div className="flex"><span className="w-24 text-yellow-400 font-bold">eastereggs</span> <span>List all easter eggs</span></div>
                             </div>
                         )
@@ -320,12 +325,12 @@ export const useCommandLogic = ({
                     break;
 
                 case 'cowsay':
-                    localStorage.setItem('cowsay_used', 'true');
+                    trackEvent('cowsay_used', true);
                     newLines.push({ type: 'output', content: <CowsayOutput args={args} /> });
                     break;
 
                 case 'fortune':
-                    localStorage.setItem('fortune_used', 'true');
+                    trackEvent('fortune_used', true);
                     newLines.push({ type: 'output', content: <FortuneOutput /> });
                     break;
 
@@ -359,7 +364,7 @@ export const useCommandLogic = ({
                     break;
 
                 case 'type':
-                    localStorage.setItem('typing_test', 'true');
+                    trackEvent('typing_test', true);
                     setActiveComponent(<TypeGame onExit={(score) => {
                         setActiveComponent(null);
                         if (score) {
@@ -369,12 +374,12 @@ export const useCommandLogic = ({
                     break;
 
                 case 'fire':
-                    localStorage.setItem('fire_used', 'true');
+                    trackEvent('fire_used', true);
                     setActiveComponent(<FireEffect onExit={() => setActiveComponent(null)} scrollToBottom={scrollToBottom} />);
                     break;
 
                 case 'docker':
-                    localStorage.setItem('docker_used', 'true');
+                    trackEvent('docker_used', true);
                     if (args.length === 0) {
                         newLines.push({ type: 'output', content: <span className="text-slate-400">Usage: docker [ps | images | run &lt;image&gt;]</span> });
                     } else {
@@ -608,6 +613,64 @@ export const useCommandLogic = ({
                     });
                     break;
 
+                case 'history':
+                    if (commandHistory.length === 0) {
+                        newLines.push({ type: 'output', content: <span className="text-slate-500">No commands in history yet.</span> });
+                    } else {
+                        newLines.push({
+                            type: 'output',
+                            content: (
+                                <div className="font-mono text-sm space-y-1">
+                                    <div className="text-green-400 font-bold mb-2">Command History ({commandHistory.length} commands):</div>
+                                    <div className="max-h-64 overflow-y-auto custom-scrollbar">
+                                        {commandHistory.map((cmd, idx) => (
+                                            <div key={idx} className="flex items-start gap-3 text-slate-300">
+                                                <span className="text-slate-600 text-xs w-8 flex-shrink-0">{idx + 1}</span>
+                                                <span className="flex-1">{cmd}</span>
+                                            </div>
+                                        ))}
+                                    </div>
+                                    <div className="text-slate-500 text-xs mt-2">Use ↑/↓ arrow keys to navigate history</div>
+                                </div>
+                            )
+                        });
+                    }
+                    break;
+
+                case 'tree':
+                    const buildTree = (node: FSNode, prefix: string = '', isLast: boolean = true, depth: number = 0, nodeName: string = '~'): string[] => {
+                        if (depth > 5) return []; // Limit depth
+                        const lines: string[] = [];
+                        const connector = isLast ? '└── ' : '├── ';
+                        lines.push(prefix + connector + nodeName);
+                        
+                        if (node.type === 'dir' && node.children) {
+                            const children = Object.entries(node.children);
+                            children.forEach(([childName, childNode], index) => {
+                                const isLastChild = index === children.length - 1;
+                                const newPrefix = prefix + (isLast ? '    ' : '│   ');
+                                lines.push(...buildTree(childNode, newPrefix, isLastChild, depth + 1, childName));
+                            });
+                        }
+                        return lines;
+                    };
+                    
+                    const rootNode = fileSystem['~'];
+                    if (rootNode) {
+                        const treeLines = buildTree(rootNode);
+                        newLines.push({
+                            type: 'output',
+                            content: (
+                                <pre className="font-mono text-sm text-green-400 whitespace-pre overflow-x-auto">
+                                    {treeLines.join('\n')}
+                                </pre>
+                            )
+                        });
+                    } else {
+                        newLines.push({ type: 'output', content: <span className="text-red-400">tree: cannot access filesystem</span> });
+                    }
+                    break;
+
                 case 'clear':
                     setLines([]);
                     return;
@@ -636,7 +699,6 @@ export const useCommandLogic = ({
                     }
                     
                     // Default devmode status display
-                    const isDevMode = localStorage.getItem('developer_mode') === 'true';
                     const easterEggs = [
                         { key: 'konami_unlocked', name: 'Konami Code' },
                         { key: 'logo_clicked_10', name: 'Logo Clicker (10x)' },
@@ -655,12 +717,11 @@ export const useCommandLogic = ({
                         { key: 'cowsay_used', name: 'Cowsay' },
                         { key: 'bsod_triggered', name: 'BSOD' }
                     ];
-                    const found = easterEggs.filter(egg => localStorage.getItem(egg.key) === 'true');
+                    const found = easterEggs.filter(egg => !!stats[egg.key]);
                     newLines.push({
                         type: 'output',
                         content: (
                             <DevModeStatus 
-                                isDevMode={isDevMode}
                                 found={found}
                                 easterEggs={easterEggs}
                             />
@@ -703,17 +764,17 @@ export const useCommandLogic = ({
                     break;
 
                 case 'bsod':
-                    localStorage.setItem('bsod_triggered', 'true');
+                    trackEvent('bsod_triggered', true);
                     setBsodTriggered(true);
                     return;
 
                 case 'sudo':
                     if (args.join(' ').includes('rm -rf /')) {
-                        localStorage.setItem('bsod_triggered', 'true');
+                        trackEvent('bsod_triggered', true);
                         setBsodTriggered(true);
                         return;
                     } else if (args.join(' ').includes('make-me-a-sandwich')) {
-                        localStorage.setItem('sudo_sandwich', 'true');
+                        trackEvent('sudo_sandwich', true);
                         newLines.push({ type: 'output', content: <span className="text-green-400">Okay. 🥪</span> });
                     } else {
                         newLines.push({ type: 'output', content: <span className="text-red-400 font-bold">Permission denied: You are not in the sudoers file. This incident will be reported.</span> });
@@ -721,7 +782,7 @@ export const useCommandLogic = ({
                     break;
 
                 case 'matrix':
-                    localStorage.setItem('matrix_activated', 'true');
+                    trackEvent('matrix_activated', true);
                     setActiveComponent(<MatrixProcess setMatrixMode={setMatrixMode} onExit={() => setActiveComponent(null)} />);
                     break;
 
@@ -735,7 +796,7 @@ export const useCommandLogic = ({
 
                 case 'rm':
                     if (args.includes('-rf') && (args.includes('/') || args.includes('*'))) {
-                        localStorage.setItem('bsod_triggered', 'true');
+                        trackEvent('bsod_triggered', true);
                         setBsodTriggered(true);
                         return;
                     } else {
@@ -760,12 +821,12 @@ export const useCommandLogic = ({
                     break;
 
                 case 'hack':
-                    localStorage.setItem('hack_attempted', 'true');
+                    trackEvent('hack_attempted', true);
                     setActiveComponent(<HackProcess onExit={() => setActiveComponent(null)} scrollToBottom={scrollToBottom} />);
                     break;
 
                 case 'game':
-                    localStorage.setItem('snake_played', 'true');
+                    trackEvent('snake_played', true);
                     setActiveComponent(<SnakeGame onExit={(score) => {
                         setActiveComponent(null);
                         setLines(prev => [...prev, { type: 'output', content: <span className="text-green-400">Game Over! Score: {score}</span> }]);
@@ -773,7 +834,7 @@ export const useCommandLogic = ({
                     break;
 
                 case 'party':
-                    localStorage.setItem('party_started', 'true');
+                    trackEvent('party_started', true);
                     setActiveComponent(<PartyParrot onExit={() => setActiveComponent(null)} />);
                     break;
 
@@ -786,7 +847,7 @@ export const useCommandLogic = ({
 
                 case 'coffee':
                 case 'brew':
-                    localStorage.setItem('coffee_used', 'true');
+                    trackEvent('coffee_used', true);
                     newLines.push({ type: 'output', content: <CoffeeOutput /> });
                     break;
 
@@ -802,12 +863,12 @@ export const useCommandLogic = ({
                     break;
 
                 case '42':
-                    localStorage.setItem('answer_42', 'true');
+                    trackEvent('answer_42', true);
                     newLines.push({ type: 'output', content: <span className="text-green-400">The Answer to the Ultimate Question of Life, the Universe, and Everything.</span> });
                     break;
 
                 case 'whois':
-                    localStorage.setItem('whois_used', 'true');
+                    trackEvent('whois_used', true);
                     const subArg = args[0]?.toLowerCase();
                     if (!subArg || subArg === 'ankit') {
                         newLines.push({

@@ -11,7 +11,7 @@ const Navbar: React.FC<NavbarProps> = ({ onOpenTerminal }) => {
   const [scrolled, setScrolled] = useState(false);
   const [logoClickCount, setLogoClickCount] = useState(0);
   const [showEasterEgg, setShowEasterEgg] = useState(false);
-  const { unlockAchievement } = useAchievements();
+  const { trackEvent } = useAchievements();
 
   useEffect(() => {
     const handleScroll = () => setScrolled(window.scrollY > 50);
@@ -25,15 +25,12 @@ const Navbar: React.FC<NavbarProps> = ({ onOpenTerminal }) => {
     
     const newCount = logoClickCount + 1;
     setLogoClickCount(newCount);
+    trackEvent('logo_clicks');
     
     if (newCount === 5) {
-      localStorage.setItem('logo_clicked_5', 'true');
-      unlockAchievement('logo_clicker');
       setShowEasterEgg(true);
       setTimeout(() => setShowEasterEgg(false), 3000);
     } else if (newCount === 10) {
-      localStorage.setItem('logo_clicked_10', 'true');
-      unlockAchievement('logo_obsessed');
       setShowEasterEgg(true);
       setTimeout(() => setShowEasterEgg(false), 3000);
     }

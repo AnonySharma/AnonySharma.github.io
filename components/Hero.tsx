@@ -1,18 +1,19 @@
 import React, { useState } from 'react';
 import { ArrowRight, Github, Linkedin, Mail, Download, FileText } from 'lucide-react';
 import { CONTACT_INFO } from '../constants';
+import { useAchievements } from '../contexts/AchievementContext';
 
 const Hero: React.FC = () => {
   const [downloadCount, setDownloadCount] = useState(0);
   const [showEasterEgg, setShowEasterEgg] = useState(false);
+  const { trackEvent } = useAchievements();
 
   const handleResumeDownload = () => {
     const count = downloadCount + 1;
     setDownloadCount(count);
     
     // Track for achievement
-    const current = parseInt(localStorage.getItem('resume_downloads') || '0');
-    localStorage.setItem('resume_downloads', (current + 1).toString());
+    trackEvent('resume_downloads');
     
     if (count >= 3) {
       setShowEasterEgg(true);
@@ -78,13 +79,38 @@ const Hero: React.FC = () => {
         )}
 
         <div className="mt-12 flex gap-6 text-slate-400">
-            <a href="https://github.com/AnonySharma" target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors" aria-label="GitHub Profile">
+            <a 
+              href="https://github.com/AnonySharma" 
+              target="_blank" 
+              rel="noopener noreferrer" 
+              className="hover:text-white transition-colors" 
+              aria-label="GitHub Profile"
+              onClick={() => {
+                trackEvent('social_github_clicked', true);
+              }}
+            >
                 <Github size={24} />
             </a>
-            <a href={CONTACT_INFO.linkedin} target="_blank" rel="noopener noreferrer" className="hover:text-blue-400 transition-colors" aria-label="LinkedIn Profile">
+            <a 
+              href={CONTACT_INFO.linkedin} 
+              target="_blank" 
+              rel="noopener noreferrer" 
+              className="hover:text-blue-400 transition-colors" 
+              aria-label="LinkedIn Profile"
+              onClick={() => {
+                trackEvent('social_linkedin_clicked', true);
+              }}
+            >
                 <Linkedin size={24} />
             </a>
-            <a href={`mailto:${CONTACT_INFO.email}`} className="hover:text-secondary transition-colors" aria-label="Send Email">
+            <a 
+              href={`mailto:${CONTACT_INFO.email}`} 
+              className="hover:text-secondary transition-colors" 
+              aria-label="Send Email"
+              onClick={() => {
+                trackEvent('social_email_clicked', true);
+              }}
+            >
                 <Mail size={24} />
             </a>
         </div>

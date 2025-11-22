@@ -1,8 +1,44 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { PROJECTS } from '../constants';
-import { ExternalLink, Github } from 'lucide-react';
+import { Github } from 'lucide-react';
+import { useErrors } from '../contexts/ErrorContext';
 
 const Projects: React.FC = () => {
+  const { addError } = useErrors();
+  const [loadingProject, setLoadingProject] = useState<string | null>(null);
+  const errorTriggeredRef = React.useRef(false);
+
+  const handleProjectClick = async (projectId: string, projectTitle: string) => {
+    // Only trigger error once per session
+    if (errorTriggeredRef.current || localStorage.getItem('error_caught') === 'true') {
+      return;
+    }
+
+    setLoadingProject(projectId);
+    
+    // Simulate fetching project details from API
+    try {
+      // Simulate API call that fails
+      await new Promise((_, reject) => {
+        setTimeout(() => {
+          reject(new Error(`Failed to fetch project details: Connection timeout`));
+        }, 800 + Math.random() * 400); // 800-1200ms delay to feel realistic
+      });
+    } catch (error: any) {
+      // Only trigger error on first project click
+      if (!errorTriggeredRef.current) {
+        errorTriggeredRef.current = true;
+        addError(
+          'Project Details Service Unavailable',
+          `Unable to fetch additional details for "${projectTitle}".\n\nError: ${error.message}\n\nThis might be due to:\n  - Network connectivity issues\n  - API service temporarily unavailable\n  - Rate limiting\n\nPlease try again later.\n\nStack trace:\n  at ProjectService.fetchDetails (api/projects.js:127:23)\n  at Projects.handleProjectClick (Projects.tsx:${Math.floor(Math.random() * 50) + 20}:15)`,
+          'error'
+        );
+      }
+    } finally {
+      setLoadingProject(null);
+    }
+  };
+
   return (
     <section id="projects" className="py-24 bg-slate-900">
        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -17,16 +53,30 @@ const Projects: React.FC = () => {
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {PROJECTS.map((project) => (
-                <div key={project.id} className="group bg-slate-950 border border-slate-800 rounded-xl overflow-hidden hover:border-slate-600 transition-all hover:shadow-xl hover:shadow-primary/10 flex flex-col h-full">
+                <div 
+                    key={project.id} 
+                    onClick={() => handleProjectClick(project.id, project.title)}
+                    className="group bg-slate-950 border border-slate-800 rounded-xl overflow-hidden hover:border-slate-600 transition-all hover:shadow-xl hover:shadow-primary/10 flex flex-col h-full cursor-pointer"
+                >
                     <div className="relative h-48 overflow-hidden bg-slate-800">
                         <img 
                             src={project.imageUrl} 
                             alt={project.title} 
                             className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110 opacity-80 group-hover:opacity-100"
                         />
+                        {loadingProject === project.id && (
+                            <div className="absolute inset-0 bg-black/70 flex items-center justify-center">
+                                <div className="text-white text-sm">Loading details...</div>
+                            </div>
+                        )}
                         <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-4">
-                            {/* Buttons are placeholders since actual links weren't provided, but kept for UI completeness */}
-                            <button className="p-2 bg-white/10 rounded-full hover:bg-white/20 text-white backdrop-blur-sm transition-colors">
+                            <button 
+                                className="p-2 bg-white/10 rounded-full hover:bg-white/20 text-white backdrop-blur-sm transition-colors"
+                                onClick={(e) => {
+                                    e.stopPropagation();
+                                    // GitHub link would go here
+                                }}
+                            >
                                 <Github size={20} />
                             </button>
                         </div>

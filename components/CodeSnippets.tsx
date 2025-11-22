@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Code2, Copy, Check, ExternalLink } from 'lucide-react';
+import { useAchievements } from '../contexts/AchievementContext';
 
 interface CodeSnippet {
   id: string;
@@ -81,18 +82,12 @@ LIMIT 100;
 const CodeSnippets: React.FC = () => {
   const [selectedSnippet, setSelectedSnippet] = useState<CodeSnippet | null>(null);
   const [copied, setCopied] = useState(false);
+  const { trackEvent } = useAchievements();
 
   const handleCopy = async (code: string) => {
     await navigator.clipboard.writeText(code);
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
-    
-    // Track for achievement
-    const viewed = JSON.parse(localStorage.getItem('code_snippets_viewed') || '[]');
-    if (!viewed.includes(selectedSnippet?.id)) {
-      viewed.push(selectedSnippet?.id);
-      localStorage.setItem('code_snippets_viewed', JSON.stringify(viewed));
-    }
   };
 
   return (
@@ -114,11 +109,7 @@ const CodeSnippets: React.FC = () => {
               key={snippet.id}
               onClick={() => {
                 setSelectedSnippet(snippet);
-                const viewed = JSON.parse(localStorage.getItem('code_snippets_viewed') || '[]');
-                if (!viewed.includes(snippet.id)) {
-                  viewed.push(snippet.id);
-                  localStorage.setItem('code_snippets_viewed', JSON.stringify(viewed));
-                }
+                trackEvent('code_snippets_viewed', snippet.id);
               }}
               className="text-left bg-slate-900 border border-slate-800 rounded-xl p-6 hover:border-primary transition-all hover:shadow-lg hover:shadow-primary/10"
             >
