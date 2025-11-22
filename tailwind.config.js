@@ -16,11 +16,18 @@ export default {
       },
       animation: {
         'spin-slow': 'spin 8s linear infinite',
+        'scan': 'scan 4s linear infinite'
       },
       fontFamily: {
         sans: ['Inter', 'sans-serif'],
         serif: ['Playfair Display', 'serif'],
       },
+      keyframes: {
+        scan: {
+          '0%': { top: '-10%' },
+          '100%': { top: '110%' },
+        }
+      }
     },
   },
   plugins: [],

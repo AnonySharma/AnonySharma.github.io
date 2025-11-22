@@ -32,6 +32,25 @@
   }
 }
 
+/* Terminal-specific scrollbar */
+.custom-scrollbar::-webkit-scrollbar {
+  width: 8px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: rgba(15, 23, 42, 0.5);
+  border-radius: 4px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: rgba(51, 65, 85, 0.8);
+  border-radius: 4px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: rgba(71, 85, 105, 0.9);
+}
+
 /* Ensure dark background classes work */
 .bg-slate-950 {
   background-color: #020617;
@@ -47,5 +66,66 @@
 
 .text-slate-400 {
   color: #94a3b8;
+}
+
+/* 404 Page Animations */
+@keyframes fadeIn {
+  from { 
+    opacity: 0; 
+    transform: translateY(10px); 
+  }
+  to { 
+    opacity: 1; 
+    transform: translateY(0); 
+  }
+}
+
+@keyframes float {
+  0%, 100% { 
+    transform: translateY(0) translateX(0); 
+    opacity: 0; 
+  }
+  10% { 
+    opacity: 1; 
+  }
+  90% { 
+    opacity: 1; 
+  }
+  100% { 
+    transform: translateY(-100vh) translateX(20px); 
+    opacity: 0; 
+  }
+}
+
+@keyframes gridMove {
+  0% { 
+    transform: translate(0, 0); 
+  }
+  100% { 
+    transform: translate(40px, 40px); 
+  }
+}
+
+@keyframes glitch {
+  0%, 100% { 
+    transform: translate(0); 
+  }
+  20% { 
+    transform: translate(-2px, 2px); 
+  }
+  40% { 
+    transform: translate(-2px, -2px); 
+  }
+  60% { 
+    transform: translate(2px, 2px); 
+  }
+  80% { 
+    transform: translate(2px, -2px); 
+  }
+}
+
+.animate-fadeIn {
+  animation: fadeIn 0.5s ease-out forwards;
+  opacity: 0;
 }
 

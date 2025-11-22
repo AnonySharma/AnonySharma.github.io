@@ -1,165 +1,22 @@
 <!DOCTYPE html>
-<html lang="en" class="scroll-smooth">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>404 - Page Not Found | Ankit Kumar</title>
-    <link rel="icon" type="image/x-icon" href="/favicon.ico">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&family=Playfair+Display:ital,wght@0,700;1,600&display=swap" rel="stylesheet">
-    <style>
-        body { 
-            font-family: 'Inter', sans-serif;
-            background: #020617;
-            color: #e2e8f0;
-            margin: 0;
-            padding: 0;
-            min-height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-        .container {
-            max-width: 800px;
-            padding: 2rem;
-            font-family: 'Courier New', monospace;
-        }
-        .error-code {
-            font-size: 8rem;
-            font-weight: bold;
-            color: #6366f1;
-            text-shadow: 0 0 20px rgba(99, 102, 241, 0.5);
-            line-height: 1;
-            margin-bottom: 1rem;
-        }
-        .terminal {
-            background: #0f172a;
-            border: 1px solid #334155;
-            border-radius: 8px;
-            padding: 2rem;
-            margin: 2rem 0;
-            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
-        }
-        .prompt {
-            color: #10b981;
-            margin-bottom: 0.5rem;
-        }
-        .command {
-            color: #e2e8f0;
-        }
-        .output {
-            color: #fbbf24;
-            margin: 1rem 0;
-            line-height: 1.6;
-        }
-        .error {
-            color: #ef4444;
-        }
-        .suggestion {
-            color: #60a5fa;
-            margin-top: 1.5rem;
-            padding-top: 1.5rem;
-            border-top: 1px solid #334155;
-        }
-        .link {
-            color: #6366f1;
-            text-decoration: none;
-            font-weight: bold;
-            transition: color 0.3s;
-        }
-        .link:hover {
-            color: #818cf8;
-            text-decoration: underline;
-        }
-        .blink {
-            animation: blink 1s infinite;
-        }
-        @keyframes blink {
-            0%, 50% { opacity: 1; }
-            51%, 100% { opacity: 0; }
-        }
-        .ascii-art {
-            color: #6366f1;
-            font-size: 0.7rem;
-            line-height: 1.2;
-            margin: 1rem 0;
-            white-space: pre;
-        }
-    </style>
+    <script>
+        // Redirect to index.html for SPA routing on GitHub Pages
+        // This allows React Router to handle the 404 page display
+        var path = window.location.pathname;
+        var search = window.location.search;
+        var hash = window.location.hash;
+        // Remove '404.html' from path and redirect to let React Router handle it
+        var cleanPath = path.split('/').filter(function(p) { return p && p !== '404.html'; }).join('/');
+        window.location.replace((cleanPath || '/') + search + hash);
+    </script>
 </head>
 <body>
-    <div class="container">
-        <div class="error-code">404</div>
-        
-        <div class="terminal">
-            <div class="prompt">ankit@portfolio:~$ <span class="command">cd /path/to/page</span></div>
-            <div class="output error">bash: cd: /path/to/page: No such file or directory</div>
-            
-            <div class="prompt">ankit@portfolio:~$ <span class="command">ls -la /</span></div>
-            <div class="output">
-                total 42<br>
-                drwxr-xr-x  1 root root  4096 Nov 22 16:00 .<br>
-                drwxr-xr-x  1 root root  4096 Nov 22 16:00 ..<br>
-                -rw-r--r--  1 root root  1337 Nov 22 16:00 home<br>
-                -rw-r--r--  1 root root  404  Nov 22 16:00 <span class="error">this-page</span><br>
-                drwxr-xr-x  1 root root  2048 Nov 22 16:00 projects<br>
-                drwxr-xr-x  1 root root  1024 Nov 22 16:00 skills<br>
-                drwxr-xr-x  1 root root   512 Nov 22 16:00 about<br>
-            </div>
-            
-            <div class="prompt">ankit@portfolio:~$ <span class="command">cat this-page</span></div>
-            <div class="output error">
-                cat: this-page: No such file or directory<br>
-                <br>
-                <span class="ascii-art">
-    ╔═══════════════════════════════════╗
-    ║  404 ERROR: PAGE NOT FOUND        ║
-    ║                                   ║
-    ║  The page you're looking for      ║
-    ║  has been moved, deleted, or      ║
-    ║  never existed in the first place.║
-    ║                                   ║
-    ║  Maybe it's in another branch?    ║
-    ║  Or perhaps it was lost in a      ║
-    ║  merge conflict?                  ║
-    ╚═══════════════════════════════════╝
-                </span>
-            </div>
-            
-            <div class="prompt">ankit@portfolio:~$ <span class="command">find / -name "lost-page" 2>/dev/null</span></div>
-            <div class="output">(no results found)</div>
-            
-            <div class="prompt">ankit@portfolio:~$ <span class="command">echo $?</span></div>
-            <div class="output error">1</div>
-            
-            <div class="prompt">ankit@portfolio:~$ <span class="command">git log --all --full-history -- "*lost-page*"</span></div>
-            <div class="output">fatal: ambiguous argument '*lost-page*': unknown revision or path not in the working tree.</div>
-            
-            <div class="suggestion">
-                <strong>💡 Suggestion:</strong> Try navigating to the <a href="/" class="link">home page</a> or use the terminal to explore available pages.<br>
-                <span style="color: #94a3b8; font-size: 0.9rem;">Available commands: <code style="color: #10b981;">cd home</code>, <code style="color: #10b981;">cd projects</code>, <code style="color: #10b981;">cd about</code></span>
-            </div>
-            
-            <div class="prompt">ankit@portfolio:~$ <span class="blink">_</span></div>
-        </div>
-        
-        <div style="text-align: center; margin-top: 2rem; color: #64748b;">
-            <a href="/" class="link" style="font-size: 1.1rem;">← Return to Home</a>
-        </div>
-    </div>
-    
-    <script>
-        // Auto-redirect to home after 10 seconds (optional)
-        // setTimeout(() => {
-        //     window.location.href = '/';
-        // }, 10000);
-        
-        // Add some terminal-like interactivity
-        document.addEventListener('keydown', (e) => {
-            if (e.key === 'Enter' || e.key === ' ') {
-                window.location.href = '/';
-            }
-        });
-    </script>
+    <p>Redirecting...</p>
 </body>
 </html>
 

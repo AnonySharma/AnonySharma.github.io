@@ -123,9 +123,9 @@ export const TopProcess: React.FC<{ onExit: (finalSnapshot: React.ReactNode) => 
             setStats([
                 { pid: 666, user: 'ai', pri: 20, ni: 0, virt: '10.2g', res: '4.1g', shr: '102m', s: 'S', cpu: (Math.random() * 5 + 95).toFixed(1), mem: 32.0, time: '1337:00', command: 'world_domination' },
                 { pid: 420, user: 'ankit', pri: 20, ni: 0, virt: '802m', res: '204m', shr: '32m', s: 'R', cpu: (Math.random() * 10 + 5).toFixed(1), mem: 4.5, time: '42:00.00', command: 'portfolio-dev' },
-                { pid: 1, user: 'root', pri: 20, ni: 0, virt: '164m', res: '12m', shr: '4m', s: 'S', cpu: 0.0, mem: 0.1, time: '1:23.45', command: 'init' },
-                { pid: 1337, user: 'visitor', pri: 20, ni: 0, virt: '24m', res: '4m', shr: '2m', s: 'S', cpu: 0.0, mem: 0.1, time: '0:00.12', command: 'bash' },
-                { pid: 88, user: 'daemon', pri: 20, ni: 0, virt: '42m', res: '8m', shr: '2m', s: 'S', cpu: 0.3, mem: 0.4, time: '0:10.00', command: 'kworker/u2:1' },
+                { pid: 1, user: 'root', pri: 20, ni: 0, virt: '164m', res: '12m', shr: '4m', s: 'S', cpu: (0.0).toFixed(1), mem: 0.1, time: '1:23.45', command: 'init' },
+                { pid: 1337, user: 'visitor', pri: 20, ni: 0, virt: '24m', res: '4m', shr: '2m', s: 'S', cpu: (0.0).toFixed(1), mem: 0.1, time: '0:00.12', command: 'bash' },
+                { pid: 88, user: 'daemon', pri: 20, ni: 0, virt: '42m', res: '8m', shr: '2m', s: 'S', cpu: (0.3).toFixed(1), mem: 0.4, time: '0:10.00', command: 'kworker/u2:1' },
             ]);
         };
 
