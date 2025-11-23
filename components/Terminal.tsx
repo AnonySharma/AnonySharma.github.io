@@ -314,11 +314,26 @@ const Terminal: React.FC<TerminalProps> = ({ onClose, onMinimize, isMinimized = 
         
         focusInput();
       }}
+      onTouchEnd={(e) => {
+        // Handle touch events for mobile
+        // Only focus input if touch is directly on the terminal container or void space
+        // and NOT if the user is selecting text or touching an interactive element
+        const target = e.target as HTMLElement;
+        if (target.tagName === 'BUTTON' || target.tagName === 'INPUT' || target.closest('button') || target.closest('input')) {
+          return;
+        }
+        if (window.getSelection()?.toString()) return;
+        
+        // Prevent default to avoid double-tap zoom on mobile
+        e.preventDefault();
+        focusInput();
+      }}
       style={{ 
           fontFamily: "'Fira Code', 'JetBrains Mono', monospace",
           textShadow: matrixMode ? '0 0 8px rgba(34, 197, 94, 0.8)' : 'none',
           transformOrigin: isMinimizing || isMaximizing ? 'bottom right' : 'center center',
-          willChange: (isMinimizing || isMaximizing) ? 'transform, opacity' : 'auto'
+          willChange: (isMinimizing || isMaximizing) ? 'transform, opacity' : 'auto',
+          touchAction: 'manipulation' // Prevent double-tap zoom
       }}
     >
       {bsodTriggered && <SystemPanic onReset={() => {
@@ -432,9 +447,13 @@ const Terminal: React.FC<TerminalProps> = ({ onClose, onMinimize, isMinimized = 
                     }}
                     onSelect={handleSelect}
                     onClick={handleSelect}
+                    onTouchStart={(e) => {
+                        // Allow text selection on mobile
+                        e.stopPropagation();
+                    }}
                     onKeyUp={handleSelect}
                     onKeyDown={handleKeyDown}
-                    className={`w-full bg-transparent border-none outline-none ${matrixMode ? 'text-green-500' : 'text-slate-200'} caret-transparent font-mono text-sm sm:text-base`}
+                    className={`w-full bg-transparent border-none outline-none ${matrixMode ? 'text-green-500' : 'text-slate-200'} caret-transparent font-mono text-sm sm:text-base touch-manipulation`}
                     autoFocus
                     spellCheck={false}
                     autoComplete="off"
@@ -451,8 +470,15 @@ const Terminal: React.FC<TerminalProps> = ({ onClose, onMinimize, isMinimized = 
                 {/* Mobile submit button */}
                 <button
                   onClick={handleSubmitCommand}
+                  onTouchEnd={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    if (input.trim()) {
+                      handleSubmitCommand();
+                    }
+                  }}
                   disabled={!input.trim()}
-                  className="sm:hidden bg-primary hover:bg-indigo-600 disabled:bg-slate-700 disabled:opacity-50 text-white font-bold py-2 px-4 rounded transition-colors active:scale-95"
+                  className="sm:hidden bg-primary hover:bg-indigo-600 disabled:bg-slate-700 disabled:opacity-50 text-white font-bold py-2 px-4 rounded transition-colors active:scale-95 touch-manipulation"
                   title="Submit command"
                 >
                   →

@@ -17,6 +17,9 @@
 .yeet-animation {
   animation: yeet 1s ease-in forwards;
   pointer-events: none;
+  touch-action: none; /* Prevent touch interference during animation */
+  -webkit-transform: translateZ(0); /* Hardware acceleration for mobile */
+  transform: translateZ(0);
 }
 
 /* Incognito Mode */

@@ -22,7 +22,7 @@ const Navbar: React.FC<NavbarProps> = ({ onOpenTerminal }) => {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  const handleLogoClick = (e: React.MouseEvent) => {
+  const handleLogoClick = (e: React.MouseEvent | React.TouchEvent) => {
     e.preventDefault();
     e.stopPropagation();
     playClick();
@@ -69,8 +69,9 @@ const Navbar: React.FC<NavbarProps> = ({ onOpenTerminal }) => {
           <button 
             type="button"
             onClick={handleLogoClick}
+            onTouchEnd={handleLogoClick}
             onMouseEnter={playHover}
-            className="flex items-center space-x-2 group focus:outline-none cursor-pointer"
+            className="flex items-center space-x-2 group focus:outline-none cursor-pointer touch-manipulation"
             title="Enter Terminal Mode"
           >
             <div className="bg-gradient-to-r from-primary to-secondary p-2 rounded-lg group-hover:from-green-600 group-hover:to-green-400 transition-all duration-500">

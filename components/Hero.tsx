@@ -10,7 +10,9 @@ const Hero: React.FC = () => {
   const [nameClickCount, setNameClickCount] = useState(0);
   const { trackEvent } = useAchievements();
 
-  const handleNameClick = () => {
+  const handleNameClick = (e: React.MouseEvent | React.TouchEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
     const newCount = nameClickCount + 1;
     setNameClickCount(newCount);
 
@@ -68,7 +70,11 @@ const Hero: React.FC = () => {
           </div>
         )}
         
-        <h1 className="text-5xl md:text-7xl font-bold text-white mb-6 leading-tight select-none cursor-pointer" onClick={handleNameClick}>
+        <h1 
+          className="text-5xl md:text-7xl font-bold text-white mb-6 leading-tight select-none cursor-pointer touch-manipulation" 
+          onClick={handleNameClick}
+          onTouchEnd={handleNameClick}
+        >
           {PROFILE_CONFIG.personal.fullName}<br />
           <span className="text-3xl md:text-5xl text-transparent bg-clip-text bg-gradient-to-r from-primary to-cyan-400">{getTitleWithCompany()}</span>
         </h1>

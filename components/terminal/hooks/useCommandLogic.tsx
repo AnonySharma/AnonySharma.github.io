@@ -3,7 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { TerminalLine, FSNode } from '../TerminalTypes';
 import { SysInfoOutput, NeofetchOutput, PsOutput, TopProcess, DockerPsOutput, DockerImagesOutput, DockerRunOutput, SkillsOutput, ResumeOutput, HistoryOutput, TreeOutput, HelpOutput, WhoamiOutput, DateOutput, WhoOutput, RebootOutput, ScreensaverOutput, DevModeUnlockOutput, DockerUsageOutput, DockerErrorOutput, TypeGameScoreOutput, GameOverScoreOutput } from '../commands/SystemCommands';
 import { PingProcess } from '../commands/NetworkCommands';
-import { CowsayOutput, MatrixProcess, SteamLocomotive, CryptoMiner, TypeGame, SingPlayer, FortuneOutput, FireEffect, CoffeeOutput, HackProcess, SnakeGame, PartyParrot, JokeOutput, Answer42Output, WhoisOutput, EasterEggsOutput, StonksOutput, WeatherOutput, CoinflipOutput, YeetOutput, IncognitoOnOutput, IncognitoOffOutput, TouchGrassOutput, TouchErrorOutput, SudoSandwichOutput, SudoPermissionDeniedOutput, VimOutput, OpenSuccessOutput, SystemPanic } from '../commands/FunCommands';
+import { CowsayOutput, MatrixProcess, SteamLocomotive, CryptoMiner, TypeGame, SingPlayer, FortuneOutput, FireEffect, CoffeeOutput, HackProcess, SnakeGame, PartyParrot, JokeOutput, Answer42Output, WhoisOutput, EasterEggsOutput, StonksOutput, WeatherOutput, CoinflipOutput, YeetOutput, IncognitoOnOutput, IncognitoOffOutput, TouchGrassOutput, TouchErrorOutput, SudoSandwichOutput, SudoPermissionDeniedOutput, VimOutput, OpenSuccessOutput, SystemPanic, GitStatusOutput, GitCommitOutput, GitPushOutput, GitBlameOutput, GitLogOutput, GitMergeOutput, GitRebaseOutput } from '../commands/FunCommands';
 import { LsOutput, CatBinaryError, CatFileOutput } from '../commands/FileCommands';
 import { SKILLS } from '../../../constants';
 import { useAchievements } from '../../../contexts/AchievementContext';
@@ -85,6 +85,9 @@ export const COMMANDS: CommandInfo[] = [
     { name: 'yeet', description: 'Yeet the terminal away', category: 'fun' },
     { name: 'stonks', description: 'Check crypto portfolio', category: 'fun' },
     { name: 'incognito', description: 'Toggle dark mode', category: 'fun' },
+    
+    // Git Easter Eggs
+    { name: 'git', description: 'Git version control (with easter eggs)', category: 'fun' },
     
     // Help
     { name: 'help', description: 'Show this help message', category: 'system' },
@@ -708,6 +711,57 @@ export const useCommandLogic = ({
                 }, 1500);
                     } else {
                 newLines.push({ type: 'output', content: <TouchErrorOutput /> });
+            }
+        },
+        
+        git: (args, newLines) => {
+            if (!args[0]) {
+                newLines.push({ 
+                    type: 'output', 
+                    content: (
+                        <div className="font-mono text-sm">
+                            <div className="text-red-400">usage: git &lt;command&gt;</div>
+                            <div className="text-slate-400 mt-2">Available commands:</div>
+                            <div className="text-slate-300 mt-1 ml-4">
+                                <div>status&nbsp;&nbsp;&nbsp;&nbsp;Show the working tree status</div>
+                                <div>commit&nbsp;&nbsp;&nbsp;Record changes to the repository</div>
+                                <div>push&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Update remote refs along with associated objects</div>
+                                <div>blame&nbsp;&nbsp;&nbsp;&nbsp;Show what revision and author last modified each line</div>
+                                <div>log&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Show commit logs</div>
+                                <div>merge&nbsp;&nbsp;&nbsp;&nbsp;Join two or more development histories together</div>
+                                <div>rebase&nbsp;&nbsp;&nbsp;Reapply commits on top of another base tip</div>
+                            </div>
+                        </div>
+                    )
+                });
+                return;
+            }
+            
+            const subcommand = args[0].toLowerCase();
+            switch (subcommand) {
+                case 'status':
+                    newLines.push({ type: 'output', content: <GitStatusOutput /> });
+                    break;
+                case 'commit':
+                    newLines.push({ type: 'output', content: <GitCommitOutput args={args.slice(1)} /> });
+                    break;
+                case 'push':
+                    newLines.push({ type: 'output', content: <GitPushOutput /> });
+                    break;
+                case 'blame':
+                    newLines.push({ type: 'output', content: <GitBlameOutput args={args.slice(1)} /> });
+                    break;
+                case 'log':
+                    newLines.push({ type: 'output', content: <GitLogOutput /> });
+                    break;
+                case 'merge':
+                    newLines.push({ type: 'output', content: <GitMergeOutput /> });
+                    break;
+                case 'rebase':
+                    newLines.push({ type: 'output', content: <GitRebaseOutput /> });
+                    break;
+                default:
+                    newLines.push({ type: 'output', content: <span className="text-yellow-400">git: '{subcommand}' is not a git command. Try: status, commit, push, blame, log, merge, rebase</span> });
             }
         },
     };
