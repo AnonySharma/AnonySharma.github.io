@@ -96,10 +96,11 @@ function HomePage() {
       { id: 'contact', selector: '#contact' }
     ];
 
+    // More lenient observer options - trigger when section is 20% visible
     const observerOptions = {
       root: null,
-      rootMargin: '-50% 0px -50% 0px',
-      threshold: 0.5
+      rootMargin: '0px',
+      threshold: 0.2
     };
 
     const observer = new IntersectionObserver((entries) => {
@@ -108,19 +109,34 @@ function HomePage() {
           const sectionId = entry.target.id;
           if (sectionId) {
             trackEvent(`section_${sectionId}_visited`, true);
+            // Unobserve after tracking to avoid re-tracking
+            observer.unobserve(entry.target);
           }
         }
       });
     }, observerOptions);
 
-    sections.forEach(section => {
-      const element = document.querySelector(section.selector);
-      if (element) {
-        observer.observe(element);
-      }
-    });
+    // Small delay to ensure DOM is ready
+    const timeoutId = setTimeout(() => {
+      sections.forEach(section => {
+        const element = document.querySelector(section.selector);
+        if (element) {
+          // Check if already visible on load
+          const rect = element.getBoundingClientRect();
+          const isVisible = rect.top < window.innerHeight && rect.bottom > 0;
+          if (isVisible && rect.height > 0) {
+            // Section is already visible, track it immediately
+            trackEvent(`section_${section.id}_visited`, true);
+          } else {
+            // Observe for when it becomes visible
+            observer.observe(element);
+          }
+        }
+      });
+    }, 100);
 
     return () => {
+      clearTimeout(timeoutId);
       sections.forEach(section => {
         const element = document.querySelector(section.selector);
         if (element) {

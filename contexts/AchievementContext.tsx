@@ -398,6 +398,9 @@ export const AchievementProvider: React.FC<{ children: ReactNode }> = ({ childre
         }
       } else if (key === 'total_scroll_distance') {
         next[key] = (prev[key] || 0) + (value || 0);
+      } else if (key === 'gravity_interactions') {
+        // For gravity_interactions, use the provided value (which is the total count)
+        next[key] = value !== undefined ? value : (prev[key] || 0) + 1;
       } else {
         // Default: set true for booleans or use provided value
         next[key] = value !== undefined ? value : true;
