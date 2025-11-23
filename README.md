@@ -3,6 +3,7 @@
 A modern, interactive portfolio website showcasing my work, skills, and experience as a Software Engineer. Built with React, TypeScript, and Tailwind CSS, featuring an interactive terminal interface.
 
 🌐 **Live Site**: [anonySharma.github.io](https://anonySharma.github.io)
+🌐 **Customize**: Update `config.ts` with your personal information to make it your own!
 
 ## ✨ Features
 

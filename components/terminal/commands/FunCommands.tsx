@@ -1,5 +1,6 @@
 
 import React, { useState, useEffect, useRef } from 'react';
+import { PROFILE_CONFIG, getTitleWithCompany } from '../../../config';
 import { Activity } from 'lucide-react';
 
 export const CowsayOutput: React.FC<{ args: string[] }> = ({ args }) => {
@@ -704,15 +705,15 @@ export const SystemPanic: React.FC<{ onReset: () => void }> = ({ onReset }) => {
     
     useEffect(() => {
         const sequence = [
-            { text: "root@ankitos:~# rm -rf / --no-preserve-root", className: "text-white font-bold" },
+            { text: `root@${PROFILE_CONFIG.terminal.osName.toLowerCase()}s:~# rm -rf / --no-preserve-root`, className: "text-white font-bold" },
             { text: "rm: cannot remove '/proc/1/fd': Operation not permitted", className: "text-slate-500" },
-            { text: "rm: removing directory '/home/ankit/portfolio'", className: "text-red-500" },
-            { text: "rm: removing directory '/home/ankit/projects'", className: "text-red-500" },
+            { text: `rm: removing directory '/home/${PROFILE_CONFIG.terminal.username}/portfolio'`, className: "text-red-500" },
+            { text: `rm: removing directory '/home/${PROFILE_CONFIG.terminal.username}/projects'`, className: "text-red-500" },
             { text: "rm: removing directory '/usr/bin'", className: "text-red-500" },
             { text: "rm: removing directory '/var/log'", className: "text-red-500" },
             { text: "WARNING: CRITICAL SYSTEM FILE DELETED", className: "text-yellow-400 bg-red-900/30 inline-block px-1" },
             { text: "rm: removing directory '/etc/systemd'", className: "text-red-500" },
-            { text: "ALERT: ANKIT IS GONNA GO JOBLESS...", className: "text-red-500 font-bold text-xl animate-pulse" },
+            { text: `ALERT: ${PROFILE_CONFIG.personal.fullName.toUpperCase()} IS GONNA GO JOBLESS...`, className: "text-red-500 font-bold text-xl animate-pulse" },
             { text: "DELETING: CAREER_PROSPECTS.DB", className: "text-red-500" },
             { text: "DELETING: HOPE.TXT", className: "text-red-500" },
             { text: "KERNEL PANIC: init not found! Try passing init= option to kernel.", className: "text-white bg-red-600 px-1 mt-2" },
@@ -764,44 +765,50 @@ export const Answer42Output: React.FC = () => {
 export const WhoisOutput: React.FC<{ args: string[] }> = ({ args }) => {
     const subArg = args[0]?.toLowerCase();
     
-    if (!subArg || subArg === 'ankit') {
+    const firstNameLower = PROFILE_CONFIG.personal.firstName.toLowerCase();
+    const companyLower = PROFILE_CONFIG.personal.company.toLowerCase();
+    const institutionLower = PROFILE_CONFIG.education.institution.toLowerCase().replace(/[^a-z0-9]/g, '');
+    
+    if (!subArg || subArg === firstNameLower) {
         return (
             <div className="border border-green-500 p-2 text-green-500 font-mono">
-                NAME: Ankit Kumar<br />
+                NAME: {PROFILE_CONFIG.personal.fullName}<br />
                 CLASS: S-Tier Developer<br />
                 SPECIALTY: Turning Coffee into Code<br />
                 STATUS: Online & Ready to Hire<br />
-                <span className="text-slate-500 text-xs mt-1">Try 'whois cse' or 'whois salesforce' for more.</span>
+                <span className="text-slate-500 text-xs mt-1">Try 'whois {institutionLower}' or 'whois {companyLower}' for more.</span>
             </div>
         );
-    } else if (['salesforce', 'sf', 'work'].includes(subArg)) {
+    } else if ([companyLower, 'work', 'company'].includes(subArg)) {
         return (
             <div className="text-blue-400 font-mono">
-                <div className="font-bold border-b border-blue-500 mb-1">SALESFORCE IDENTITY</div>
-                <div>ROLE: Member of Technical Staff (MTS)</div>
-                <div>TENURE: Aug 2025 - Present</div>
-                <div>PREVIOUS: Associate MTS (2023-2025)</div>
-                <div>MISSION: Building enterprise cloud solutions at scale.</div>
+                <div className="font-bold border-b border-blue-500 mb-1">{PROFILE_CONFIG.personal.company.toUpperCase()} IDENTITY</div>
+                <div>ROLE: {PROFILE_CONFIG.personal.title}</div>
+                <div>TENURE: {PROFILE_CONFIG.currentRole.period}</div>
+                <div>LOCATION: {PROFILE_CONFIG.currentRole.location}</div>
+                <div>MISSION: Building enterprise solutions at scale.</div>
             </div>
         );
-    } else if (['cse', 'college', 'iit', 'bhu'].includes(subArg)) {
+    } else if ([institutionLower, 'college', 'education', 'university'].includes(subArg)) {
         return (
             <div className="text-yellow-400 font-mono">
                 <div className="font-bold border-b border-yellow-500 mb-1">ACADEMIC RECORDS</div>
-                <div>INSTITUTE: IIT (BHU) Varanasi</div>
-                <div>DEGREE: B.Tech in Computer Science & Engineering</div>
-                <div>CLASS: 2023</div>
-                <div>ACHIEVEMENTS: ICPC Regionalist (Rank 61), Design Head (Codefest).</div>
+                <div>INSTITUTE: {PROFILE_CONFIG.education.institution}</div>
+                <div>DEGREE: {PROFILE_CONFIG.education.degree}</div>
+                <div>PERIOD: {PROFILE_CONFIG.education.period}</div>
+                {PROFILE_CONFIG.education.achievements && PROFILE_CONFIG.education.achievements.length > 0 && (
+                    <div>ACHIEVEMENTS: {PROFILE_CONFIG.education.achievements.join(', ')}</div>
+                )}
             </div>
         );
     } else if (['linkedin', 'social'].includes(subArg)) {
         return (
             <div>
-                Find me on LinkedIn: <a href="https://www.linkedin.com/in/cgankitsharma/" target="_blank" className="text-blue-400 underline">cgankitsharma</a>
+                Find me on LinkedIn: <a href={PROFILE_CONFIG.social.linkedin.url} target="_blank" className="text-blue-400 underline">{PROFILE_CONFIG.social.linkedin.username}</a>
             </div>
         );
     } else {
-        return <span className="text-slate-400">Unknown user or entity: {subArg}. Try 'ankit', 'salesforce', or 'cse'.</span>;
+        return <span className="text-slate-400">Unknown user or entity: {subArg}. Try '{firstNameLower}', '{companyLower}', or '{institutionLower}'.</span>;
     }
 };
 

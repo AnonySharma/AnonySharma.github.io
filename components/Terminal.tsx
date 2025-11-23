@@ -1,5 +1,6 @@
 
 import React, { useState, useEffect, useRef, useCallback } from 'react';
+import { PROFILE_CONFIG } from '../config';
 import { TerminalLine } from './terminal/TerminalTypes';
 import { useFileSystem } from './terminal/FileSystem';
 import { SystemPanic } from './terminal/commands/FunCommands';
@@ -34,7 +35,7 @@ const Terminal: React.FC<TerminalProps> = ({ onClose, onMinimize, isMinimized = 
     // Just show welcome message if terminal was previously booted
     if (localStorage.getItem('terminal_booted') === 'true') {
       return [
-        { type: 'system', content: <div className="opacity-70 mt-2 mb-2">Access Granted. Welcome to <span className="text-blue-400 font-bold">AnkitOS v2.4</span>. Type <span className="text-yellow-400 font-bold">help</span> for list of executables.</div> }
+        { type: 'system', content: <div className="opacity-70 mt-2 mb-2">Access Granted. Welcome to <span className="text-blue-400 font-bold">{PROFILE_CONFIG.terminal.osName} {PROFILE_CONFIG.terminal.osVersion.split(' ')[0]}</span>. Type <span className="text-yellow-400 font-bold">help</span> for list of executables.</div> }
       ];
     }
     return [];
@@ -166,7 +167,7 @@ const Terminal: React.FC<TerminalProps> = ({ onClose, onMinimize, isMinimized = 
     setPhase('shell');
     // Clear logs and set the welcome message
     setLines([
-        { type: 'system', content: <div className="opacity-70 mt-2 mb-2">Access Granted. Welcome to <span className="text-blue-400 font-bold">AnkitOS v2.4</span>. Type <span className="text-yellow-400 font-bold">help</span> for list of executables.</div> }
+        { type: 'system', content: <div className="opacity-70 mt-2 mb-2">Access Granted. Welcome to <span className="text-blue-400 font-bold">{PROFILE_CONFIG.terminal.osName} {PROFILE_CONFIG.terminal.osVersion.split(' ')[0]}</span>. Type <span className="text-yellow-400 font-bold">help</span> for list of executables.</div> }
     ]);
     setCursorPos(0);
   };

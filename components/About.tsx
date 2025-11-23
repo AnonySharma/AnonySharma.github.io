@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Terminal, Coffee, Code2, Cpu } from 'lucide-react';
 import { useAchievements } from '../contexts/AchievementContext';
+import { PROFILE_CONFIG } from '../config';
 
 const About: React.FC = () => {
   const { stats } = useAchievements();
@@ -25,8 +26,8 @@ const About: React.FC = () => {
               <div className="absolute -inset-4 bg-gradient-to-r from-primary to-secondary rounded-full opacity-75 group-hover:opacity-100 blur transition duration-1000 group-hover:duration-200"></div>
               <div className="relative w-64 h-64 rounded-full overflow-hidden border-4 border-slate-800 shadow-2xl">
                 <img 
-                  src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?fit=crop&w=800&q=80" 
-                  alt="Ankit Kumar" 
+                  src={PROFILE_CONFIG.personal.avatarUrl} 
+                  alt={PROFILE_CONFIG.personal.fullName} 
                   className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
                 />
                 {/* Thug Life Glasses Overlay */}
@@ -57,22 +58,10 @@ const About: React.FC = () => {
               About Me
             </h2>
             
-            <div className="space-y-6 text-slate-400 text-lg leading-relaxed">
-              <p>
-                I'm a <span className="text-primary font-bold">Member of Technical Staff at Salesforce</span>, 
-                where I architect scalable cloud solutions. Before that, I built financial tech at Scapia and 
-                graduated from <span className="text-secondary font-bold">IIT (BHU) Varanasi</span> in 2023.
-              </p>
-              
-              <p>
-                My coding philosophy is simple: <span className="italic text-white">"Make it work, make it right, make it fast."</span>
-              </p>
-              
-              <p>
-                When I'm not debugging race conditions or optimizing database queries, you can find me 
-                competing in coding contests (ICPC Regionalist 🏆), exploring open source, or 
-                customizing my terminal configuration for the 100th time.
-              </p>
+            <div className="space-y-6 text-slate-400 text-lg leading-relaxed whitespace-pre-line">
+              {PROFILE_CONFIG.personal.bio.split('\n\n').map((paragraph, idx) => (
+                <p key={idx}>{paragraph}</p>
+              ))}
             </div>
 
             <div className="grid grid-cols-2 gap-4 mt-8">

@@ -1,6 +1,7 @@
 import React from 'react';
 import { Mail, MapPin, Linkedin } from 'lucide-react';
 import { CONTACT_INFO } from '../constants';
+import { PROFILE_CONFIG } from '../config';
 
 const Contact: React.FC = () => {
   return (
@@ -10,7 +11,7 @@ const Contact: React.FC = () => {
           <div>
             <h2 className="text-3xl md:text-4xl font-bold text-white mb-6 serif">Let's Connect</h2>
             <p className="text-slate-400 mb-8 text-lg">
-              Whether you're interested in my work at Salesforce, my Competitive Programming journey, or just want to say hi.
+              Whether you're interested in my work at {PROFILE_CONFIG.personal.company}, my journey, or just want to say hi.
             </p>
             
             <div className="space-y-6">
@@ -79,7 +80,7 @@ const Contact: React.FC = () => {
             </div>
             <div className="mb-6">
               <label className="block text-sm font-medium text-slate-400 mb-2">Message</label>
-              <textarea rows={4} className="w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-3 text-white focus:border-primary focus:outline-none transition-colors" placeholder="Hi Ankit..."></textarea>
+              <textarea rows={4} className="w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-3 text-white focus:border-primary focus:outline-none transition-colors" placeholder={`Hi ${PROFILE_CONFIG.personal.firstName}...`}></textarea>
             </div>
             <button type="button" className="w-full bg-primary hover:bg-indigo-600 text-white font-bold py-3 px-6 rounded-lg transition-all transform hover:scale-[1.02]">
               Send Message
@@ -88,7 +89,7 @@ const Contact: React.FC = () => {
         </div>
 
         <div className="border-t border-slate-800 mt-20 pt-8 text-center text-slate-500 text-sm">
-          <p>&copy; {new Date().getFullYear()} Ankit Kumar. All rights reserved.</p>
+          <p>&copy; {new Date().getFullYear()} {PROFILE_CONFIG.personal.fullName}. All rights reserved.</p>
         </div>
       </div>
     </section>

@@ -2,6 +2,7 @@
 import React, { useMemo } from 'react';
 import { FSNode, FileNode } from './TerminalTypes';
 import { EXPERIENCE, PROJECTS, CONTACT_INFO } from '../../constants';
+import { PROFILE_CONFIG, getTitleWithCompany } from '../../config';
 
 export const useFileSystem = () => {
   return useMemo<Record<string, FSNode>>(() => {
@@ -38,12 +39,12 @@ ${e.description.map(d => `  - ${d}`).join('\n')}
         content: "These are my key projects. Use 'cat <filename>' to read details or 'open <filename>' to view the live link/image."
     };
 
-    const aboutContent = `# Ankit Kumar - Developer Portfolio
+    const aboutContent = `# ${PROFILE_CONFIG.personal.fullName} - Developer Portfolio
 
 ## Identity
-**Role:** Software Engineer @ Salesforce
-**Location:** Hyderabad, India
-**Education:** IIT (BHU) Varanasi (CSE '23)
+**Role:** ${getTitleWithCompany()}
+**Location:** ${PROFILE_CONFIG.personal.location}
+**Education:** ${PROFILE_CONFIG.education.institution} (${PROFILE_CONFIG.education.period})
 **Status:** Building cool things 🚀
 
 ## Professional Summary
@@ -150,7 +151,7 @@ KONAMI_CODE=UP,UP,DOWN,DOWN,LEFT,RIGHT,LEFT,RIGHT,B,A
                             type: 'file',
                             isBinary: true,
                             content: "",
-                            url: "https://www.linkedin.com/in/cgankitsharma/"
+                            url: PROFILE_CONFIG.social.linkedin.url
                         }
                     }
                 }

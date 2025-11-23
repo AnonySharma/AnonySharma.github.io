@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { ArrowRight, Github, Linkedin, Mail, Download } from 'lucide-react';
 import { CONTACT_INFO } from '../constants';
 import { useAchievements } from '../contexts/AchievementContext';
+import { PROFILE_CONFIG, getTitleWithCompany } from '../config';
 
 const Hero: React.FC = () => {
   const [downloadCount, setDownloadCount] = useState(0);
@@ -47,8 +48,8 @@ const Hero: React.FC = () => {
     const link = document.createElement('a');
     link.href = '#';
     link.download = count >= 3 
-      ? 'Resume_Final_Final_v2_ACTUAL_FINAL_REALLY_FINAL.pdf' 
-      : 'Ankit_Kumar_Resume.pdf';
+      ? (PROFILE_CONFIG.resume.easterEggFileName || PROFILE_CONFIG.resume.fileName)
+      : PROFILE_CONFIG.resume.fileName;
     link.click();
   };
 
@@ -61,18 +62,19 @@ const Hero: React.FC = () => {
       </div>
 
       <div className="container mx-auto px-4 z-10 flex flex-col items-center text-center">
-        <div className="inline-block mb-4 px-4 py-1 rounded-full bg-slate-800 border border-slate-700 text-sm text-slate-300">
-           ICPC'21 Regionalist | Rank 61
-        </div>
+        {PROFILE_CONFIG.badges && PROFILE_CONFIG.badges.length > 0 && (
+          <div className="inline-block mb-4 px-4 py-1 rounded-full bg-slate-800 border border-slate-700 text-sm text-slate-300">
+            {PROFILE_CONFIG.badges[0]}
+          </div>
+        )}
         
         <h1 className="text-5xl md:text-7xl font-bold text-white mb-6 leading-tight select-none cursor-pointer" onClick={handleNameClick}>
-          Ankit Kumar<br />
-          <span className="text-3xl md:text-5xl text-transparent bg-clip-text bg-gradient-to-r from-primary to-cyan-400">MTS @ Salesforce</span>
+          {PROFILE_CONFIG.personal.fullName}<br />
+          <span className="text-3xl md:text-5xl text-transparent bg-clip-text bg-gradient-to-r from-primary to-cyan-400">{getTitleWithCompany()}</span>
         </h1>
 
         <p className="text-lg md:text-xl text-slate-400 max-w-2xl mb-10">
-          IIT (BHU) CSE '23 Graduate. I build scalable systems and intuitive interfaces, 
-          combining competitive programming logic with creative design.
+          {PROFILE_CONFIG.personal.tagline}
         </p>
 
         <div className="flex flex-col sm:flex-row gap-4">
@@ -103,7 +105,7 @@ const Hero: React.FC = () => {
 
         <div className="mt-12 flex gap-6 text-slate-400">
             <a 
-              href="https://github.com/AnonySharma" 
+              href={PROFILE_CONFIG.social.github.url} 
               target="_blank" 
               rel="noopener noreferrer" 
               className="hover:text-white transition-colors" 

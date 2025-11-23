@@ -1,5 +1,6 @@
 import React from 'react';
 import { Quote, Star } from 'lucide-react';
+import { PROFILE_CONFIG } from '../config';
 
 interface Testimonial {
   id: string;
@@ -15,13 +16,13 @@ const TESTIMONIALS: Testimonial[] = [
     id: '1',
     author: 'His Computer',
     role: 'Workstation',
-    content: "Ankit once fixed a bug by turning me off and on again. 10/10 would hire. He also knows that Ctrl+Z is the most powerful command in the universe.",
+    content: `${PROFILE_CONFIG.personal.firstName} once fixed a bug by turning me off and on again. 10/10 would hire. He also knows that Ctrl+Z is the most powerful command in the universe.`,
     rating: 5,
     funny: true
   },
   {
     id: '2',
-    author: 'Future Ankit',
+    author: `Future ${PROFILE_CONFIG.personal.firstName}`,
     role: 'Time Traveler',
     content: "He writes code that even he can't understand 6 months later. Perfect for job security! But seriously, his code works, and that's what matters.",
     rating: 4,
@@ -55,7 +56,7 @@ const TESTIMONIALS: Testimonial[] = [
     id: '6',
     author: 'The Bug He Fixed',
     role: 'Former Bug',
-    content: "I was a feature, not a bug. But Ankit insisted otherwise. Now I'm fixed, and honestly? I feel better. Thanks, Ankit!",
+    content: `I was a feature, not a bug. But ${PROFILE_CONFIG.personal.firstName} insisted otherwise. Now I'm fixed, and honestly? I feel better. Thanks, ${PROFILE_CONFIG.personal.firstName}!`,
     rating: 5,
     funny: true
   }

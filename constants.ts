@@ -1,4 +1,5 @@
 import { Project, Experience } from './types';
+import { PROFILE_CONFIG } from './config';
 
 export const SKILLS = [
   "C++", "JavaScript", "HTML", "Spring Boot", "Flutter", "AWS", "Material UI", "Data Structures", "Algorithms", "Competitive Programming"
@@ -88,15 +89,11 @@ export const PROJECTS: Project[] = [
   }
 ];
 
-export const ABOUT_TEXT = `I am Ankit Kumar, a Computer Science graduate from IIT (BHU) Varanasi (Class of '23) and currently a Member of Technical Staff at Salesforce. 
-
-I have a strong foundation in Competitive Programming, ranking 61st in ICPC Regionals, which fuels my problem-solving approach to software engineering. My expertise spans full-stack development—from optimizing backend schemas in BigTable to crafting intuitive UIs with Flutter and Material UI.
-
-Beyond code, I have a creative side as a former Design Head for Codefest, where I blended technical skills with visual design. I am passionate about building scalable, efficient, and user-centric solutions.`;
+export const ABOUT_TEXT = PROFILE_CONFIG.personal.bio;
 
 export const CONTACT_INFO = {
-  email: "cgankitsharma@gmail.com",
-  location: "Chas, Bokaro Steel City / Hyderabad",
-  linkedin: "https://www.linkedin.com/in/cgankitsharma",
-  linkedinHandle: "cgankitsharma"
+  email: PROFILE_CONFIG.social.email,
+  location: PROFILE_CONFIG.personal.location,
+  linkedin: PROFILE_CONFIG.social.linkedin.url,
+  linkedinHandle: PROFILE_CONFIG.social.linkedin.username
 };

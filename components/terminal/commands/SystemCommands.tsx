@@ -1,6 +1,8 @@
 
 import React, { useState, useEffect, useRef } from 'react';
 import { Monitor } from 'lucide-react';
+import { PROFILE_CONFIG, getTitleWithCompany } from '../../../config';
+import { SKILLS } from '../../../constants';
 
 export const SysInfoOutput = () => {
   const [repoCount, setRepoCount] = useState<string>('Loading...');
@@ -10,7 +12,7 @@ export const SysInfoOutput = () => {
   useEffect(() => {
     const fetchStats = async () => {
         try {
-            const response = await fetch('https://api.github.com/users/AnonySharma');
+            const response = await fetch(`https://api.github.com/users/${PROFILE_CONFIG.social.github.username}`);
             if (!response.ok) throw new Error('Failed to fetch');
             const data = await response.json();
             setRepoCount(data.public_repos.toString());
@@ -21,7 +23,7 @@ export const SysInfoOutput = () => {
             // or try to fetch repos if user has few.
             // For now, let's just show public_gists as "snippets" or something similar if stars is too hard.
             // Actually, let's try to fetch repos for stars.
-            const reposRes = await fetch('https://api.github.com/users/AnonySharma/repos?per_page=100');
+            const reposRes = await fetch(`https://api.github.com/users/${PROFILE_CONFIG.social.github.username}/repos?per_page=100`);
             if (reposRes.ok) {
                 const repos = await reposRes.json();
                 const starCount = repos.reduce((acc: number, repo: any) => acc + repo.stargazers_count, 0);
@@ -44,10 +46,10 @@ export const SysInfoOutput = () => {
     <div className="flex items-center gap-2 text-slate-400 border-b border-slate-700 pb-1 mb-2">
         <Monitor size={14} /> <span>SYSTEM DIAGNOSTICS (LIVE)</span>
     </div>
-    <div>OS: <span className="text-white">AnkitOS v2.4.0 LTS</span> (x86_64)</div>
-    <div>Kernel: <span className="text-blue-400">5.15.0-76-generic</span></div>
+    <div>OS: <span className="text-white">{PROFILE_CONFIG.terminal.osName} {PROFILE_CONFIG.terminal.osVersion}</span> (x86_64)</div>
+    <div>Kernel: <span className="text-blue-400">{PROFILE_CONFIG.terminal.kernel}</span></div>
     <div>Uptime: <span className="text-green-400">42 days, 7 hours, 12 mins</span></div>
-    <div>Shell: <span className="text-yellow-400">zsh 5.8.1</span></div>
+    <div>Shell: <span className="text-yellow-400">{PROFILE_CONFIG.terminal.shell}</span></div>
     <div className="flex gap-2">
         CPU: <span className="text-white">Neural Quantum Processor (128-core) @ 4.20GHz</span>
         <span className="text-slate-500">[Temp: 45°C]</span>
@@ -82,9 +84,9 @@ export const NeofetchOutput = () => (
 </pre>
         </div>
         <div className="space-y-1">
-            <div><span className="text-primary font-bold">ankit</span>@<span className="text-primary font-bold">portfolio</span></div>
+            <div><span className="text-primary font-bold">{PROFILE_CONFIG.terminal.username}</span>@<span className="text-primary font-bold">{PROFILE_CONFIG.terminal.hostname}</span></div>
             <div className="text-slate-500">-----------------</div>
-            <div><span className="text-yellow-400 font-bold">OS</span>: AnkitOS v2.4 LTS</div>
+            <div><span className="text-yellow-400 font-bold">OS</span>: {PROFILE_CONFIG.terminal.osName} {PROFILE_CONFIG.terminal.osVersion}</div>
             <div><span className="text-yellow-400 font-bold">Host</span>: Web Browser (Chrome V8)</div>
             <div><span className="text-yellow-400 font-bold">Kernel</span>: 5.15.0-generic</div>
             <div><span className="text-yellow-400 font-bold">Uptime</span>: 42 days, 7 hrs, 12 mins</div>
@@ -109,7 +111,7 @@ export const NeofetchOutput = () => (
 export const PsOutput = () => {
     const processes = [
         { pid: 1, user: 'root', cpu: 0.1, mem: 0.2, cmd: 'init' },
-        { pid: 420, user: 'ankit', cpu: 12.4, mem: 4.5, cmd: 'portfolio-kernel' },
+        { pid: 420, user: PROFILE_CONFIG.terminal.username, cpu: 12.4, mem: 4.5, cmd: `${PROFILE_CONFIG.terminal.hostname}-kernel` },
         { pid: 1337, user: 'visitor', cpu: 0.0, mem: 0.1, cmd: 'shell' },
         { pid: 666, user: 'ai', cpu: 99.9, mem: 32.0, cmd: 'world_domination_script.sh' },
         { pid: 8080, user: 'node', cpu: 2.3, mem: 5.6, cmd: 'npm start' },
@@ -126,7 +128,7 @@ export const PsOutput = () => {
                 <span className="shrink-0">COMMAND</span>
             </div>
             {processes.map((p) => (
-                <div key={p.pid} className={`flex min-w-[500px] ${p.user === 'root' ? 'text-red-400' : p.user === 'ankit' ? 'text-blue-400' : 'text-slate-300'}`}>
+                <div key={p.pid} className={`flex min-w-[500px] ${p.user === 'root' ? 'text-red-400' : p.user === PROFILE_CONFIG.terminal.username ? 'text-blue-400' : 'text-slate-300'}`}>
                     <span className="w-16 shrink-0">{p.pid}</span>
                     <span className="w-20 shrink-0">{p.user}</span>
                     <span className="w-16 shrink-0">{p.cpu}</span>
@@ -166,7 +168,7 @@ export const TopProcess: React.FC<{ onExit: (finalSnapshot: React.ReactNode) => 
             
             setStats([
                 { pid: 666, user: 'ai', pri: 20, ni: 0, virt: '10.2g', res: '4.1g', shr: '102m', s: 'S', cpu: (Math.random() * 5 + 95).toFixed(1), mem: 32.0, time: '1337:00', command: 'world_domination' },
-                { pid: 420, user: 'ankit', pri: 20, ni: 0, virt: '802m', res: '204m', shr: '32m', s: 'R', cpu: (Math.random() * 10 + 5).toFixed(1), mem: 4.5, time: '42:00.00', command: 'portfolio-dev' },
+                { pid: 420, user: PROFILE_CONFIG.terminal.username, pri: 20, ni: 0, virt: '802m', res: '204m', shr: '32m', s: 'R', cpu: (Math.random() * 10 + 5).toFixed(1), mem: 4.5, time: '42:00.00', command: `${PROFILE_CONFIG.terminal.hostname}-dev` },
                 { pid: 1, user: 'root', pri: 20, ni: 0, virt: '164m', res: '12m', shr: '4m', s: 'S', cpu: (0.0).toFixed(1), mem: 0.1, time: '1:23.45', command: 'init' },
                 { pid: 1337, user: 'visitor', pri: 20, ni: 0, virt: '24m', res: '4m', shr: '2m', s: 'S', cpu: (0.0).toFixed(1), mem: 0.1, time: '0:00.12', command: 'bash' },
                 { pid: 88, user: 'daemon', pri: 20, ni: 0, virt: '42m', res: '8m', shr: '2m', s: 'S', cpu: (0.3).toFixed(1), mem: 0.4, time: '0:10.00', command: 'kworker/u2:1' },
@@ -253,7 +255,7 @@ export const DockerPsOutput = () => (
             <span>42 minutes ago</span>
             <span className="text-green-400">Up 42 minutes</span>
             <span>{'0.0.0.0:3000->3000/tcp'}</span>
-            <span>ankit-portfolio</span>
+            <span>{PROFILE_CONFIG.terminal.username}-{PROFILE_CONFIG.terminal.hostname}</span>
         </div>
         <div className="text-slate-300 min-w-[800px] grid grid-cols-[120px_150px_200px_150px_150px_150px_1fr] opacity-70">
             <span className="text-yellow-400">f9e8d7c6b5a4</span>
@@ -277,7 +279,7 @@ export const DockerImagesOutput = () => (
             <span>SIZE</span>
         </div>
         <div className="text-slate-300 min-w-[600px] grid grid-cols-[200px_100px_150px_150px_1fr]">
-            <span className="text-blue-400">ankit/brain</span>
+            <span className="text-blue-400">{PROFILE_CONFIG.terminal.username}/brain</span>
             <span>latest</span>
             <span className="text-yellow-400">8f3a2b1c4d5e</span>
             <span>24 years ago</span>
@@ -291,7 +293,7 @@ export const DockerImagesOutput = () => (
             <span>420 MB</span>
         </div>
         <div className="text-slate-300 min-w-[600px] grid grid-cols-[200px_100px_150px_150px_1fr]">
-            <span className="text-blue-400">salesforce/crm</span>
+            <span className="text-blue-400">{PROFILE_CONFIG.personal.company.toLowerCase()}</span>
             <span>production</span>
             <span className="text-yellow-400">b2c3d4e5f6a1</span>
             <span>1 week ago</span>
@@ -405,29 +407,27 @@ export const ResumeOutput: React.FC = () => {
     return (
         <div className="font-mono text-sm space-y-2">
             <div className="text-green-400">═══════════════════════════════════════════════════════</div>
-            <div className="text-white font-bold text-lg">ANKIT KUMAR</div>
-            <div className="text-cyan-400">Member of Technical Staff @ Salesforce</div>
+            <div className="text-white font-bold text-lg">{PROFILE_CONFIG.personal.fullName.toUpperCase()}</div>
+            <div className="text-cyan-400">{getTitleWithCompany()}</div>
             <div className="text-slate-400">═══════════════════════════════════════════════════════</div>
             
             <div className="text-yellow-400 mt-4 font-bold">EDUCATION</div>
-            <div className="text-white">IIT (BHU) Varanasi - B.Tech CSE (2019-2023)</div>
-            <div className="text-slate-400">Rank 61 - ICPC Regionals</div>
+            <div className="text-white">{PROFILE_CONFIG.education.institution} - {PROFILE_CONFIG.education.degree} ({PROFILE_CONFIG.education.period})</div>
+            {PROFILE_CONFIG.education.achievements && PROFILE_CONFIG.education.achievements.length > 0 ? (
+              <div className="text-slate-400">{PROFILE_CONFIG.education.achievements[0]}</div>
+            ) : null}
             
             <div className="text-yellow-400 mt-4 font-bold">EXPERIENCE</div>
-            <div className="text-white">Member of Technical Staff @ Salesforce (Aug 2025 - Present)</div>
-            <div className="text-slate-400">  • Working with cutting-edge enterprise cloud solutions</div>
-            <div className="text-white">Associate MTS @ Salesforce (June 2023 - Aug 2025)</div>
-            <div className="text-slate-400">  • Contributed to core platform development</div>
-            <div className="text-white">Full Stack Developer @ Scapia (Dec 2022 - April 2023)</div>
-            <div className="text-slate-400">  • Travel-Now-Pay-Later vertical (Spring Boot + Flutter)</div>
+            <div className="text-white">{getTitleWithCompany()} ({PROFILE_CONFIG.currentRole.period})</div>
+            <div className="text-slate-400">  • {PROFILE_CONFIG.currentRole.location}</div>
             
             <div className="text-yellow-400 mt-4 font-bold">SKILLS</div>
-            <div className="text-cyan-400">C++, JavaScript, HTML, Spring Boot, Flutter, AWS, Material UI</div>
+            <div className="text-cyan-400">{SKILLS.slice(0, 7).join(', ')}</div>
             
             <div className="text-yellow-400 mt-4 font-bold">CONTACT</div>
-            <div className="text-white">Email: cgankitsharma@gmail.com</div>
-            <div className="text-white">LinkedIn: linkedin.com/in/cgankitsharma</div>
-            <div className="text-white">GitHub: github.com/AnonySharma</div>
+            <div className="text-white">Email: {PROFILE_CONFIG.social.email}</div>
+            <div className="text-white">LinkedIn: linkedin.com/in/{PROFILE_CONFIG.social.linkedin.username}</div>
+            <div className="text-white">GitHub: github.com/{PROFILE_CONFIG.social.github.username}</div>
             
             <div className="text-green-400 mt-4">═══════════════════════════════════════════════════════</div>
             <div className="text-slate-500 text-xs">Type 'download resume' or click the download button for PDF version</div>

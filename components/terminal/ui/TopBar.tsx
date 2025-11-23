@@ -1,5 +1,6 @@
 import React from 'react';
 import { X, Maximize2, Minimize2, Activity, Wifi, Battery, Cpu } from 'lucide-react';
+import { PROFILE_CONFIG } from '../../../config';
 
 interface TopBarProps {
   onClose: () => void;
@@ -28,7 +29,7 @@ export const TopBar: React.FC<TopBarProps> = ({ onClose, onMinimize, isMaximized
       </div>
       <div className="text-xs text-slate-500 flex items-center gap-2">
         <Activity size={12} className={phase === 'boot' ? 'animate-spin' : ''} />
-        <span>ankit@portfolio: {path.join('/')}</span>
+        <span>{PROFILE_CONFIG.terminal.username}@{PROFILE_CONFIG.terminal.hostname}: {path.join('/')}</span>
       </div>
       <div className="flex gap-2">
         <div className="text-xs text-slate-600 flex items-center gap-2 mr-2">

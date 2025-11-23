@@ -2,6 +2,7 @@
 import { useEffect, useRef } from 'react';
 import { TerminalLine } from '../TerminalTypes';
 import React from 'react';
+import { PROFILE_CONFIG } from '../../../config';
 
 export const useBootSequence = (
   phase: 'static' | 'boot' | 'login' | 'shell',
@@ -31,7 +32,7 @@ export const useBootSequence = (
     hasBooted.current = true;
 
     const bootMessages = [
-      { text: "Linux version 5.15.0-76-generic (ankit@portfolio) (gcc version 11.3.0 (Ubuntu 11.3.0-1ubuntu1~22.04.1)) #1 SMP PREEMPT Mon Aug 21 12:00:00 UTC 2025", delay: 50 },
+      { text: `Linux version ${PROFILE_CONFIG.terminal.kernel} (${PROFILE_CONFIG.terminal.username}@${PROFILE_CONFIG.terminal.hostname}) (gcc version 11.3.0 (Ubuntu 11.3.0-1ubuntu1~22.04.1)) #1 SMP PREEMPT Mon Aug 21 12:00:00 UTC 2025`, delay: 50 },
       { text: "Command line: BOOT_IMAGE=/boot/vmlinuz-5.15.0-76-generic root=UUID=1337-CODE ro quiet splash vt.handoff=7", delay: 50 },
       { text: "KERNEL supported cpus:", delay: 20 },
       { text: "  Intel GenuineIntel", delay: 20 },
@@ -45,7 +46,7 @@ export const useBootSequence = (
       { text: "BIOS-e820: [mem 0x000000000009fc00-0x000000000009ffff] reserved", delay: 20 },
       { text: "NX (Execute Disable) protection: active", delay: 40 },
       { text: "SMBIOS 2.8 present.", delay: 30 },
-      { text: "DMI: AnkitPortfolio/VirtualMachine, BIOS 1.0 08/21/2025", delay: 50 },
+      { text: `DMI: ${PROFILE_CONFIG.personal.fullName.replace(/\s+/g, '')}Portfolio/VirtualMachine, BIOS 1.0 08/21/2025`, delay: 50 },
       { text: "tsc: Fast TSC calibration failed", delay: 100 },
       { text: "tsc: Detected 3000.000 MHz processor", delay: 50 },
       { text: "Calibrating delay loop (skipped), value calculated using timer frequency.. 6000.00 BogoMIPS (lpj=3000000)", delay: 80 },
@@ -65,7 +66,7 @@ export const useBootSequence = (
       { text: "Run /init as init process", delay: 150 },
       { text: "systemd[1]: Detected virtualization 'portfolio-vm'.", delay: 100 },
       { text: "systemd[1]: Detected architecture x86-64.", delay: 50 },
-      { text: "systemd[1]: Starting AnkitOS v2.4 Initialization Service...", delay: 200 },
+      { text: `systemd[1]: Starting ${PROFILE_CONFIG.terminal.osName} ${PROFILE_CONFIG.terminal.osVersion.split(' ')[0]} Initialization Service...`, delay: 200 },
       { text: React.createElement(React.Fragment, null, React.createElement("span", { className: "text-green-400" }, "[  OK  ]"), " Started Dispatch Password Requests to Console Directory Watch."), delay: 100 },
       { text: React.createElement(React.Fragment, null, React.createElement("span", { className: "text-green-400" }, "[  OK  ]"), " Reached target Local Encrypted Volumes."), delay: 50 },
       { text: React.createElement(React.Fragment, null, React.createElement("span", { className: "text-green-400" }, "[  OK  ]"), " Started Load Kernel Module: Creativity."), delay: 150 },
@@ -77,7 +78,7 @@ export const useBootSequence = (
       { text: React.createElement(React.Fragment, null, React.createElement("span", { className: "text-green-400" }, "[  OK  ]"), " Started Network Manager."), delay: 100 },
       { text: React.createElement(React.Fragment, null, React.createElement("span", { className: "text-green-400" }, "[  OK  ]"), " Reached target Multi-User System."), delay: 50 },
       { text: React.createElement(React.Fragment, null, React.createElement("span", { className: "text-green-400" }, "[  OK  ]"), " Reached target Graphical Interface."), delay: 500 },
-      { text: "Welcome to AnkitOS v2.4", delay: 200 },
+      { text: `Welcome to ${PROFILE_CONFIG.terminal.osName} ${PROFILE_CONFIG.terminal.osVersion.split(' ')[0]}`, delay: 200 },
     ];
 
     const runBootSequence = async () => {

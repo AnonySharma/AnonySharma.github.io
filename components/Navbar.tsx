@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Menu, X, Volume2, VolumeX } from 'lucide-react';
 import { useAchievements } from '../contexts/AchievementContext';
 import { useSound } from '../contexts/SoundContext';
+import { PROFILE_CONFIG, getDisplayName } from '../config';
 
 interface NavbarProps {
   onOpenTerminal: () => void;
@@ -73,9 +74,9 @@ const Navbar: React.FC<NavbarProps> = ({ onOpenTerminal }) => {
             title="Enter Terminal Mode"
           >
             <div className="bg-gradient-to-r from-primary to-secondary p-2 rounded-lg group-hover:from-green-600 group-hover:to-green-400 transition-all duration-500">
-              <span className="text-white font-bold text-xl font-serif font-mono">AK</span>
+              <span className="text-white font-bold text-xl font-serif font-mono">{getDisplayName().initials}</span>
             </div>
-            <span className="text-xl font-bold hidden sm:block group-hover:text-green-400 transition-colors">Ankit Kumar</span>
+            <span className="text-xl font-bold hidden sm:block group-hover:text-green-400 transition-colors">{PROFILE_CONFIG.personal.fullName}</span>
           </button>
           
           {showEasterEgg && (
