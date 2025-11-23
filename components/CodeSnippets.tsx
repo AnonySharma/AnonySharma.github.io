@@ -111,7 +111,13 @@ const CodeSnippets: React.FC = () => {
                 setSelectedSnippet(snippet);
                 trackEvent('code_snippets_viewed', snippet.id);
               }}
-              className="text-left bg-slate-900 border border-slate-800 rounded-xl p-6 hover:border-primary transition-all hover:shadow-lg hover:shadow-primary/10"
+              onTouchEnd={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                setSelectedSnippet(snippet);
+                trackEvent('code_snippets_viewed', snippet.id);
+              }}
+              className="text-left bg-slate-900 border border-slate-800 rounded-xl p-6 hover:border-primary transition-all hover:shadow-lg hover:shadow-primary/10 touch-manipulation"
             >
               <div className="flex items-center gap-2 mb-2">
                 <span className="text-xs px-2 py-1 bg-slate-800 text-slate-400 rounded">
@@ -136,14 +142,24 @@ const CodeSnippets: React.FC = () => {
                 <div className="flex gap-2">
                   <button
                     onClick={() => handleCopy(selectedSnippet.code)}
-                    className="p-2 bg-slate-800 hover:bg-slate-700 rounded-lg transition-colors"
+                    onTouchEnd={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      handleCopy(selectedSnippet.code);
+                    }}
+                    className="p-2 bg-slate-800 hover:bg-slate-700 rounded-lg transition-colors touch-manipulation min-w-[44px] min-h-[44px] flex items-center justify-center"
                     title="Copy code"
                   >
                     {copied ? <Check size={18} className="text-green-400" /> : <Copy size={18} className="text-slate-300" />}
                   </button>
                   <button
                     onClick={() => setSelectedSnippet(null)}
-                    className="p-2 bg-slate-800 hover:bg-slate-700 rounded-lg transition-colors text-slate-300"
+                    onTouchEnd={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      setSelectedSnippet(null);
+                    }}
+                    className="p-2 bg-slate-800 hover:bg-slate-700 rounded-lg transition-colors text-slate-300 touch-manipulation min-w-[44px] min-h-[44px] flex items-center justify-center"
                   >
                     ✕
                   </button>

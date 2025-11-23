@@ -13,8 +13,17 @@ const ProjectCard: React.FC<{ project: any, onClick: () => void, loading: boolea
             style={gravity.style}
             onMouseMove={gravity.onMouseMove}
             onMouseLeave={gravity.onMouseLeave}
+            onTouchMove={gravity.onTouchMove}
+            onTouchEnd={(e) => {
+                // Handle gravity reset
+                if (gravity.onTouchEnd) {
+                    gravity.onTouchEnd();
+                }
+                // Small delay to allow gravity animation to complete, then trigger click
+                setTimeout(() => onClick(), 50);
+            }}
             onClick={onClick}
-            className="group bg-slate-950 border border-slate-800 rounded-xl overflow-hidden hover:border-slate-600 transition-all hover:shadow-xl hover:shadow-primary/10 flex flex-col h-full cursor-pointer"
+            className="group bg-slate-950 border border-slate-800 rounded-xl overflow-hidden hover:border-slate-600 transition-all hover:shadow-xl hover:shadow-primary/10 flex flex-col h-full cursor-pointer touch-manipulation"
         >
             <div className="relative h-48 overflow-hidden bg-slate-800">
                 <img 

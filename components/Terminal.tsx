@@ -68,11 +68,15 @@ const Terminal: React.FC<TerminalProps> = ({ onClose, onMinimize, isMinimized = 
   const handleMaximizeToggle = (maximized: boolean) => {
     setIsMaximized(maximized);
     if (maximized) {
-      document.documentElement.requestFullscreen().catch((e) => {
-        console.log(`Error attempting to enable fullscreen mode: ${e.message} (${e.name})`);
-      });
+      // Check if fullscreen is supported
+      if (document.documentElement.requestFullscreen) {
+        document.documentElement.requestFullscreen().catch((e) => {
+          // Silently fail on mobile browsers that don't support fullscreen
+          console.log(`Fullscreen not available: ${e.message}`);
+        });
+      }
     } else {
-      if (document.fullscreenElement) {
+      if (document.fullscreenElement && document.exitFullscreen) {
         document.exitFullscreen().catch((e) => {
            console.log(`Error attempting to exit fullscreen mode: ${e.message} (${e.name})`);
         });

@@ -7,18 +7,15 @@ export const useGravity = (strength: number = 20) => {
   const { trackEvent, stats } = useAchievements();
   const lastTrackedTimeRef = useRef(0);
 
-  const handleMouseMove = useCallback((e: React.MouseEvent<HTMLElement>) => {
+  const handleMove = useCallback((clientX: number, clientY: number) => {
     if (!ref.current) return;
 
     const rect = ref.current.getBoundingClientRect();
     const centerX = rect.left + rect.width / 2;
     const centerY = rect.top + rect.height / 2;
 
-    const mouseX = e.clientX;
-    const mouseY = e.clientY;
-
-    const deltaX = (mouseX - centerX) / (rect.width / 2);
-    const deltaY = (mouseY - centerY) / (rect.height / 2);
+    const deltaX = (clientX - centerX) / (rect.width / 2);
+    const deltaY = (clientY - centerY) / (rect.height / 2);
 
     setPosition({
       x: deltaX * strength,
@@ -34,7 +31,17 @@ export const useGravity = (strength: number = 20) => {
     }
   }, [strength, trackEvent, stats]);
 
-  const handleMouseLeave = useCallback(() => {
+  const handleMouseMove = useCallback((e: React.MouseEvent<HTMLElement>) => {
+    handleMove(e.clientX, e.clientY);
+  }, [handleMove]);
+
+  const handleTouchMove = useCallback((e: React.TouchEvent<HTMLElement>) => {
+    if (e.touches.length > 0) {
+      handleMove(e.touches[0].clientX, e.touches[0].clientY);
+    }
+  }, [handleMove]);
+
+  const handleLeave = useCallback(() => {
     setPosition({ x: 0, y: 0 });
   }, []);
 
@@ -45,7 +52,9 @@ export const useGravity = (strength: number = 20) => {
       transition: 'transform 0.1s ease-out'
     },
     onMouseMove: handleMouseMove,
-    onMouseLeave: handleMouseLeave
+    onMouseLeave: handleLeave,
+    onTouchMove: handleTouchMove,
+    onTouchEnd: handleLeave
   };
 };
 

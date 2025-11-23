@@ -129,7 +129,12 @@ const Achievements: React.FC = () => {
       {/* Achievement Button */}
       <button
         onClick={() => setIsOpen(true)}
-        className="fixed bottom-6 left-6 z-40 p-3 bg-slate-800 border border-slate-700 rounded-full hover:bg-slate-700 transition-all hover:scale-110 group"
+        onTouchEnd={(e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          setIsOpen(true);
+        }}
+        className="fixed bottom-6 left-6 z-40 p-3 sm:p-3 bg-slate-800 border border-slate-700 rounded-full hover:bg-slate-700 transition-all hover:scale-110 group touch-manipulation min-w-[56px] min-h-[56px] flex items-center justify-center"
         title="View Achievements"
       >
         <Trophy size={20} className="text-yellow-400 group-hover:text-yellow-300" />
