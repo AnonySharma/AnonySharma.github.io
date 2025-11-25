@@ -3,7 +3,7 @@ import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { PROFILE_CONFIG } from '../config';
 import { TerminalLine } from './terminal/TerminalTypes';
 import { useFileSystem } from './terminal/FileSystem';
-import { SystemPanic } from './terminal/commands/FunCommands';
+import { SystemPanic } from './terminal/commands/outputs/fun/easterEggOutputs';
 import { TopBar } from './terminal/ui/TopBar';
 import { Prompt } from './terminal/ui/Prompt';
 import { useMatrixEffect } from './terminal/hooks/useMatrixEffect';

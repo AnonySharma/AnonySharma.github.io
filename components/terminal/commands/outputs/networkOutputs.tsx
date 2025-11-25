@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useRef } from 'react';
 
 export const PingProcess: React.FC<{ args: string[], onExit: (output: string[]) => void, scrollToBottom: () => void }> = ({ args, onExit, scrollToBottom }) => {
@@ -66,3 +65,4 @@ export const PingProcess: React.FC<{ args: string[], onExit: (output: string[]) 
         </div>
     );
 };
+

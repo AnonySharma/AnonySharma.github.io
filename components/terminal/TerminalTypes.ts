@@ -20,3 +20,6 @@ export type DirNode = {
 };
 
 export type FSNode = FileNode | DirNode;
+
+// Command handler type
+export type CommandHandler = (args: string[], newLines: TerminalLine[]) => 'exit' | 'clear' | void;

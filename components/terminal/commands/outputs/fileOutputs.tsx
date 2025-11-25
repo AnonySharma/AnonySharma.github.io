@@ -1,7 +1,6 @@
-
 import React from 'react';
-import { FSNode } from '../TerminalTypes';
-import { SyntaxHighlighter } from '../SyntaxHighlighter';
+import { FSNode } from '../../TerminalTypes';
+import { SyntaxHighlighter } from '../../SyntaxHighlighter';
 
 // LS Output Component
 export const LsOutput: React.FC<{ children: Array<[string, FSNode]> }> = ({ children }) => {
@@ -33,5 +32,10 @@ export const CatFileOutput: React.FC<{ fileName: string; content: string | React
         return <SyntaxHighlighter code={content} language={ext} />;
     }
     return <>{content}</>;
+};
+
+// Open Success Output Component
+export const OpenSuccessOutput: React.FC<{ fileName: string }> = ({ fileName }) => {
+    return <span className="text-green-400">Opening {fileName}...</span>;
 };
 
