@@ -60,21 +60,25 @@ A modern, interactive portfolio website showcasing my work, skills, and experien
 
 ```
 .
-├── components/          # React components
-│   ├── terminal/        # Terminal emulator components
-│   │   ├── commands/    # Terminal command implementations
-│   │   ├── hooks/       # Custom React hooks
-│   │   └── ui/          # Terminal UI components
-│   ├── About.tsx        # About section
-│   ├── Contact.tsx      # Contact section
-│   ├── Hero.tsx         # Hero section
-│   ├── Projects.tsx     # Projects showcase
-│   └── Skills.tsx       # Skills section
-├── constants.ts         # App constants and data
-├── types.ts            # TypeScript type definitions
-├── index.css           # Global styles and Tailwind imports
-├── tailwind.config.js  # Tailwind CSS configuration
-└── vite.config.ts      # Vite configuration
+├── components/              # React components
+│   ├── sections/           # Page sections (Hero, About, Skills, etc.)
+│   ├── layout/             # Layout components (Navbar, SectionWrapper, ErrorBoundary)
+│   ├── effects/            # Visual effects (ParticleSystem, GlobalBackground, Screensaver)
+│   ├── hooks/              # Shared custom hooks (use3DCard)
+│   ├── ui/                 # UI components (Achievements, NotFound)
+│   └── terminal/           # Terminal emulator
+│       ├── commands/       # Command system
+│       │   ├── registry/   # Command definitions (commandRegistry.ts)
+│       │   ├── handlers/   # Command handlers (organized by category)
+│       │   └── outputs/    # Output components (organized by category)
+│       ├── hooks/          # Terminal hooks (useCommandLogic, useBootSequence)
+│       └── ui/             # Terminal UI components
+├── config.ts               # Profile configuration
+├── constants.ts            # App constants and data
+├── contexts/               # React contexts (AchievementContext)
+├── index.css               # Global styles and Tailwind imports
+├── tailwind.config.js      # Tailwind CSS configuration
+└── vite.config.ts          # Vite configuration
 ```
 
 ## 🚢 Deployment
@@ -98,27 +102,17 @@ npm run deploy
 
 ## 🎨 Customization
 
-### Update Personal Information
+See [CONFIG_README.md](CONFIG_README.md) for detailed customization guide, including:
+- Updating personal information via `config.ts`
+- Customizing terminal branding
+- Modifying styling and themes
+- Adding projects and experience
 
-Edit `constants.ts` to update:
-- Skills
-- Work experience
-- Projects
-- About text
-- Contact information
+## 📚 Documentation
 
-### Styling
-
-- Tailwind configuration: `tailwind.config.js`
-- Global styles: `index.css`
-- Custom colors are defined in the Tailwind config (primary, secondary, dark)
-
-### Terminal Commands
-
-Add custom terminal commands in `components/terminal/commands/`:
-- `SystemCommands.tsx` - System-related commands
-- `NetworkCommands.tsx` - Network commands
-- `FunCommands.tsx` - Fun/entertainment commands
+- **[DEVELOPMENT.md](DEVELOPMENT.md)** - Guide for adding new terminal commands and understanding the codebase architecture
+- **[CONFIG_README.md](CONFIG_README.md)** - Complete configuration guide for customizing the portfolio
+- **[ACHIEVEMENTS.md](ACHIEVEMENTS.md)** - Achievement cheatsheet for unlocking all portfolio features
 
 ## 🔧 Development Notes
 
