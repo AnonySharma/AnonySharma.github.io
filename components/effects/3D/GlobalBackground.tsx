@@ -1,4 +1,4 @@
-import React, { useRef, useState, useMemo } from 'react';
+import { useRef, useState } from 'react';
 import { Canvas, useFrame, useThree } from '@react-three/fiber';
 import { Points, PointMaterial, Stars } from '@react-three/drei';
 import * as random from 'maath/random/dist/maath-random.esm';
@@ -72,9 +72,6 @@ const GlobalBackground: React.FC = () => {
     </div>
   );
 };
-
-// We need to install maath for the random sphere generation
-// npm install maath
 
 export default GlobalBackground;
 

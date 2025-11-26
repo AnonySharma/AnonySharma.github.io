@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useRef } from 'react';
 import { ArrowRight, Github, Linkedin, Mail, Download } from 'lucide-react';
 import { useSpring, animated, useTrail } from '@react-spring/web';
 import { CONTACT_INFO } from '../../constants';

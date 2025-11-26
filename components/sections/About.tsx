@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Terminal, Coffee, Code2, Cpu } from 'lucide-react';
+import { Terminal, Code2, Cpu } from 'lucide-react';
 import { useAchievements } from '../../contexts/AchievementContext';
 import { PROFILE_CONFIG } from '../../config';
 import SectionWrapper from '../layout/SectionWrapper';

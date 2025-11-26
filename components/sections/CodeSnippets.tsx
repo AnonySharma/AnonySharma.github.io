@@ -162,12 +162,12 @@ const CodeSnippets: React.FC = () => {
             return (
               <animated.button
                 key={snippet.id}
-                ref={card3D.ref}
+                ref={card3D.ref as any}
                 style={{
                   ...card3D.style,
                   animationDelay: `${index * 100}ms`,
                 }}
-                onMouseMove={card3D.onMouseMove}
+                onMouseMove={card3D.onMouseMove as any}
                 onMouseLeave={card3D.onMouseLeave}
                 onMouseEnter={card3D.onMouseEnter}
                 onClick={() => {
@@ -180,15 +180,15 @@ const CodeSnippets: React.FC = () => {
                   setSelectedSnippet(snippet);
                   trackEvent('code_snippets_viewed', snippet.id);
                 }}
-                className="relative text-left bg-gradient-to-br from-slate-900/90 via-slate-800/80 to-slate-900/90 border border-slate-700/50 rounded-2xl p-8 backdrop-blur-sm transition-all hover:border-primary/50 touch-manipulation group overflow-hidden shadow-xl hover:shadow-2xl hover:shadow-primary/20"
+                  className="relative text-left bg-gradient-to-br from-slate-900/90 via-slate-800/80 to-slate-900/90 border border-slate-700/50 rounded-2xl p-8 backdrop-blur-sm transition-all hover:border-primary/50 touch-manipulation group overflow-hidden shadow-xl hover:shadow-2xl hover:shadow-primary/20"
               >
                 {/* Animated gradient background */}
                 <div className="absolute inset-0 bg-gradient-to-br from-primary/10 via-transparent to-secondary/10 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
                 
                 {/* Glow effect */}
-                <div 
+                <animated.div 
                   className="absolute -inset-1 bg-gradient-to-r from-primary/30 via-secondary/30 to-primary/30 rounded-2xl opacity-0 group-hover:opacity-100 blur-xl transition-opacity duration-500 -z-10"
-                  style={card3D.glowStyle}
+                  style={card3D.glowStyle as any}
                 />
                 
                 {/* Language badge */}
@@ -219,7 +219,7 @@ const CodeSnippets: React.FC = () => {
                 {/* Hover indicator */}
                 <div className="absolute bottom-4 right-4 opacity-0 group-hover:opacity-100 transition-opacity">
                   <div className="w-2 h-2 bg-primary rounded-full animate-pulse" />
-                </div>
+              </div>
               </animated.button>
             );
           })}
@@ -246,26 +246,26 @@ const CodeSnippets: React.FC = () => {
                       </span>
                       <h3 className="text-2xl font-bold text-white">{selectedSnippet.title}</h3>
                     </div>
-                    <p className="text-sm text-slate-400">{selectedSnippet.description}</p>
-                  </div>
-                  <div className="flex gap-2">
-                    <button
-                      onClick={() => handleCopy(selectedSnippet.code)}
+                  <p className="text-sm text-slate-400">{selectedSnippet.description}</p>
+                </div>
+                <div className="flex gap-2">
+                  <button
+                    onClick={() => handleCopy(selectedSnippet.code)}
                       className="p-3 bg-slate-800/50 hover:bg-slate-700/50 border border-slate-700/50 rounded-lg transition-all touch-manipulation min-w-[44px] min-h-[44px] flex items-center justify-center group"
-                      title="Copy code"
-                    >
+                    title="Copy code"
+                  >
                       {copied ? (
                         <Check size={20} className="text-green-400" />
                       ) : (
                         <Copy size={20} className="text-slate-300 group-hover:text-primary transition-colors" />
                       )}
-                    </button>
-                    <button
+                  </button>
+                  <button
                       onClick={handleClose}
                       className="p-3 bg-slate-800/50 hover:bg-slate-700/50 border border-slate-700/50 rounded-lg transition-all text-slate-300 hover:text-white touch-manipulation min-w-[44px] min-h-[44px] flex items-center justify-center"
-                    >
+                  >
                       <X size={20} />
-                    </button>
+                  </button>
                   </div>
                 </div>
               </div>

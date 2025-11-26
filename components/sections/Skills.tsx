@@ -1,5 +1,4 @@
 import React from 'react';
-import { SKILLS } from '../../constants';
 import { Code2, Cpu, Layout, Terminal } from 'lucide-react';
 import { use3DCard } from '../hooks/use3DCard';
 import SectionWrapper from '../layout/SectionWrapper';
@@ -9,10 +8,9 @@ const SkillCard: React.FC<{
   icon: React.ReactNode, 
   title: string, 
   skills: string[], 
-  colorClass: string,
   iconColorClass: string,
   hoverBgClass: string
-}> = ({ icon, title, skills, colorClass, iconColorClass, hoverBgClass }) => {
+}> = ({ icon, title, skills, iconColorClass, hoverBgClass }) => {
   const card3D = use3DCard({ intensity: 12, enableGlow: true });
 
   return (
@@ -62,7 +60,6 @@ const Skills: React.FC = () => {
             icon={<Code2 />}
             title="Languages"
             skills={['C++', 'JavaScript', 'HTML']}
-            colorClass="border-primary/50"
             iconColorClass="text-primary"
             hoverBgClass="bg-primary/20"
           />
@@ -72,7 +69,6 @@ const Skills: React.FC = () => {
             icon={<Layout />}
             title="Full Stack & Cloud"
             skills={['Spring Boot', 'Flutter', 'React', 'AWS', 'Material UI']}
-            colorClass="border-cyan-500/50"
             iconColorClass="text-cyan-500"
             hoverBgClass="bg-cyan-500/20"
           />
@@ -82,7 +78,6 @@ const Skills: React.FC = () => {
             icon={<Terminal />}
             title="Core Concepts"
             skills={['Data Structures', 'Algorithms', 'Problem Solving', 'Loan Underwriting']}
-            colorClass="border-secondary/50"
             iconColorClass="text-secondary"
             hoverBgClass="bg-secondary/20"
           />

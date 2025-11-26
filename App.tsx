@@ -217,10 +217,10 @@ function HomePage() {
         <Skills />
         <Projects />
         <Suspense fallback={<div className="min-h-screen" />}>
-          <CodeSnippets />
+        <CodeSnippets />
         </Suspense>
         <Suspense fallback={<div className="min-h-screen" />}>
-          <Testimonials />
+        <Testimonials />
         </Suspense>
         <About />
         <Contact />

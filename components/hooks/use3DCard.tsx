@@ -1,4 +1,4 @@
-import { useRef, useState, useEffect } from 'react';
+import { useRef, useState } from 'react';
 import { useSpring, animated } from '@react-spring/web';
 
 interface Use3DCardOptions {
