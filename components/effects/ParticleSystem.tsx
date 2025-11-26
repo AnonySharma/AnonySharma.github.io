@@ -1,5 +1,10 @@
 import React, { useRef, useEffect } from 'react';
 
+interface Point {
+  x: number;
+  y: number;
+}
+
 interface Particle {
   x: number;
   y: number;
@@ -15,16 +20,28 @@ const ParticleSystem: React.FC = () => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const particlesRef = useRef<Particle[]>([]);
   const animationFrameRef = useRef<number | undefined>(undefined);
-  const mouseRef = useRef({ x: 0, y: 0 });
+  // Initialize as null to indicate no interaction yet
+  const mouseRef = useRef<Point | null>(null);
 
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
 
-    const handleMouseMove = (e: MouseEvent) => {
-      mouseRef.current = { x: e.clientX, y: e.clientY };
+    const handleMouseMove = (e: MouseEvent | TouchEvent) => {
+      let clientX: number, clientY: number;
+      if ('touches' in e) {
+        clientX = e.touches[0].clientX;
+        clientY = e.touches[0].clientY;
+      } else {
+        clientX = (e as MouseEvent).clientX;
+        clientY = (e as MouseEvent).clientY;
+      }
+      mouseRef.current = { x: clientX, y: clientY };
     };
+    
     window.addEventListener('mousemove', handleMouseMove);
+    window.addEventListener('touchmove', handleMouseMove, { passive: false });
+    window.addEventListener('touchstart', handleMouseMove, { passive: false });
 
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
@@ -58,11 +75,6 @@ const ParticleSystem: React.FC = () => {
     const animate = () => {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
       
-      // Calculate relative mouse position based on canvas position (handles scrolling)
-      const rect = canvas.getBoundingClientRect();
-      const relMouseX = mouseRef.current.x - rect.left;
-      const relMouseY = mouseRef.current.y - rect.top;
-
       // Update and draw particles
       particlesRef.current.forEach((p, i) => {
         // Aging
@@ -75,18 +87,27 @@ const ParticleSystem: React.FC = () => {
         }
 
         // Global cursor attraction (all particles try to touch cursor)
-        const dx = relMouseX - p.x;
-        const dy = relMouseY - p.y;
-        const distance = Math.sqrt(dx * dx + dy * dy);
-        
-        // Stronger attraction when closer, weaker when far
-        // But always some pull to ensure they "try to touch"
-        const force = Math.max(0, (1000 - distance) / 1000); 
-        // Increased attraction strength significantly for faster movement ("fasten them up")
-        const attractionStrength = 0.15 * force; 
-        
-        p.vx += (dx / (distance || 1)) * attractionStrength;
-        p.vy += (dy / (distance || 1)) * attractionStrength;
+        if (mouseRef.current) {
+          const rect = canvas.getBoundingClientRect();
+          const relMouseX = mouseRef.current.x - rect.left;
+          const relMouseY = mouseRef.current.y - rect.top;
+
+          const dx = relMouseX - p.x;
+          const dy = relMouseY - p.y;
+          const distance = Math.sqrt(dx * dx + dy * dy);
+          
+          // Stronger attraction when closer, weaker when far
+          const force = Math.max(0, (1000 - distance) / 1000); 
+          const attractionStrength = 0.15 * force; 
+          
+          p.vx += (dx / (distance || 1)) * attractionStrength;
+          p.vy += (dy / (distance || 1)) * attractionStrength;
+        } else {
+          // Wander randomly if no interaction
+          // Small random force to keep them alive and moving naturally
+          p.vx += (Math.random() - 0.5) * 0.02;
+          p.vy += (Math.random() - 0.5) * 0.02;
+        }
 
         // Damping / Friction (slightly less friction to allow speed build up)
         p.vx *= 0.96;
@@ -131,6 +152,8 @@ const ParticleSystem: React.FC = () => {
     return () => {
       window.removeEventListener('resize', resizeCanvas);
       window.removeEventListener('mousemove', handleMouseMove);
+      window.removeEventListener('touchmove', handleMouseMove);
+      window.removeEventListener('touchstart', handleMouseMove);
       if (animationFrameRef.current) {
         cancelAnimationFrame(animationFrameRef.current);
       }
