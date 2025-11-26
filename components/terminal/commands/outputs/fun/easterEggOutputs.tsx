@@ -176,17 +176,17 @@ export const SingPlayer: React.FC<{ onFinish: () => void }> = ({ onFinish }) => 
     audioRef.current = audio;
     audio.volume = 0.6;
     
-    audio.currentTime = 44.0;
-
     const handleCanPlay = () => {
-      if (status === 'loading') {
-        setStatus('playing');
-        audio.play().catch(e => {
-            console.error("Playback failed", e);
-            setStatus('stopped');
-            onFinish();
-        });
-      }
+        // Use a ref to check initialization status to avoid dependency loop
+        if (audio.paused && audio.currentTime === 0) {
+            audio.currentTime = 44.0;
+            setStatus('playing');
+            audio.play().catch(e => {
+                console.error("Playback failed", e);
+                setStatus('stopped');
+                onFinish();
+            });
+        }
     };
 
     const handleTimeUpdate = () => {
@@ -201,6 +201,7 @@ export const SingPlayer: React.FC<{ onFinish: () => void }> = ({ onFinish }) => 
     audio.addEventListener('canplaythrough', handleCanPlay);
     audio.addEventListener('timeupdate', handleTimeUpdate);
 
+    // If already ready, trigger manually
     if (audio.readyState >= 3) {
         handleCanPlay();
     }
@@ -231,7 +232,7 @@ export const SingPlayer: React.FC<{ onFinish: () => void }> = ({ onFinish }) => 
       }
       window.removeEventListener('keydown', handleKeyDown);
     };
-  }, [status, onFinish]);
+  }, []); // Empty dependency array to prevent re-creation of Audio object on status change
 
   if (status === 'loading') {
       return (
@@ -259,12 +260,12 @@ export const SingPlayer: React.FC<{ onFinish: () => void }> = ({ onFinish }) => 
             return (
                 <span 
                     key={i} 
-                    className={`inline-block mr-2 transition-all duration-100 ${
+                    className={`inline-block mr-2 transition-all duration-100 rounded px-1 font-bold ${
                         isActive 
-                            ? 'text-green-400 scale-110 font-bold shadow-[0_0_10px_#4ade80] bg-green-400/10 rounded px-1' 
+                            ? 'text-green-400 shadow-[0_0_10px_#4ade80] bg-green-400/10' 
                             : isPast 
-                                ? 'text-slate-500 opacity-50' 
-                                : 'text-slate-700'
+                                ? 'text-slate-500 opacity-50 bg-transparent' 
+                                : 'text-slate-700 bg-transparent'
                     }`}
                 >
                     {word.text}
@@ -273,7 +274,7 @@ export const SingPlayer: React.FC<{ onFinish: () => void }> = ({ onFinish }) => 
         })}
       </div>
       {status === 'playing' && (
-          <div className="mt-4 text-xs text-slate-500 animate-pulse">
+          <div className="mt-4 text-xs text-slate-500 w-full">
               Press <span className="text-white font-bold">Cmd+C</span> or <span className="text-white font-bold">Ctrl+Shift+C</span> to stop
           </div>
       )}

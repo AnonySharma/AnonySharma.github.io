@@ -180,7 +180,7 @@ const CodeSnippets: React.FC = () => {
                   setSelectedSnippet(snippet);
                   trackEvent('code_snippets_viewed', snippet.id);
                 }}
-                  className="relative text-left bg-gradient-to-br from-slate-900/90 via-slate-800/80 to-slate-900/90 border border-slate-700/50 rounded-2xl p-8 backdrop-blur-sm transition-all hover:border-primary/50 touch-manipulation group overflow-hidden shadow-xl hover:shadow-2xl hover:shadow-primary/20"
+                className="relative text-left bg-gradient-to-br from-slate-900/90 via-slate-800/80 to-slate-900/90 border border-slate-700/50 rounded-2xl p-8 backdrop-blur-sm transition-all hover:border-primary/50 touch-manipulation group overflow-hidden shadow-xl hover:shadow-2xl hover:shadow-primary/20"
               >
                 {/* Animated gradient background */}
                 <div className="absolute inset-0 bg-gradient-to-br from-primary/10 via-transparent to-secondary/10 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
@@ -219,7 +219,7 @@ const CodeSnippets: React.FC = () => {
                 {/* Hover indicator */}
                 <div className="absolute bottom-4 right-4 opacity-0 group-hover:opacity-100 transition-opacity">
                   <div className="w-2 h-2 bg-primary rounded-full animate-pulse" />
-              </div>
+                </div>
               </animated.button>
             );
           })}

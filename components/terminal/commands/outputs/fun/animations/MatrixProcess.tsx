@@ -15,8 +15,8 @@ export const MatrixProcess: React.FC<{ setMatrixMode: (m: boolean) => void, onEx
     }, [setMatrixMode, onExit]);
 
     return (
-        <div className="text-green-400 font-mono animate-pulse my-2">
-            Matrix Mode Active. Reality suspended.
+        <div className="text-green-400 font-mono my-2 whitespace-nowrap overflow-hidden w-full">
+            <span className="animate-pulse">Matrix Mode Active. Reality suspended.</span>
             <br/>
             <span className="text-xs opacity-70 text-slate-400">Press Ctrl+C to disconnect from the Matrix.</span>
         </div>
