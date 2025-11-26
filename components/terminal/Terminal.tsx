@@ -1,15 +1,15 @@
 
 import React, { useState, useEffect, useRef, useCallback } from 'react';
-import { PROFILE_CONFIG } from '../config';
-import { TerminalLine } from './terminal/TerminalTypes';
-import { useFileSystem } from './terminal/FileSystem';
-import { SystemPanic } from './terminal/commands/outputs/fun/easterEggOutputs';
-import { TopBar } from './terminal/ui/TopBar';
-import { Prompt } from './terminal/ui/Prompt';
-import { useMatrixEffect } from './terminal/hooks/useMatrixEffect';
-import { useBootSequence } from './terminal/hooks/useBootSequence';
-import { useCommandLogic } from './terminal/hooks/useCommandLogic';
-import { useSound } from '../contexts/SoundContext';
+import { PROFILE_CONFIG } from '../../config';
+import { TerminalLine } from './TerminalTypes';
+import { useFileSystem } from './FileSystem';
+import { SystemPanic } from './commands/outputs/fun/easterEggOutputs';
+import { TopBar } from './ui/TopBar';
+import { Prompt } from './ui/Prompt';
+import { useMatrixEffect } from './hooks/useMatrixEffect';
+import { useBootSequence } from './hooks/useBootSequence';
+import { useCommandLogic } from './hooks/useCommandLogic';
+import { useSound } from '../../contexts/SoundContext';
 
 interface TerminalProps {
   onClose: () => void;

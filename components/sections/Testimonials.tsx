@@ -1,6 +1,8 @@
 import React from 'react';
 import { Quote, Star } from 'lucide-react';
-import { PROFILE_CONFIG } from '../config';
+import { PROFILE_CONFIG } from '../../config';
+import { use3DCard } from '../hooks/use3DCard';
+import SectionWrapper from '../layout/SectionWrapper';
 
 interface Testimonial {
   id: string;
@@ -64,7 +66,7 @@ const TESTIMONIALS: Testimonial[] = [
 
 const Testimonials: React.FC = () => {
   return (
-    <section id="testimonials" className="py-24 bg-gradient-to-b from-slate-900 to-slate-950">
+    <SectionWrapper id="testimonials" variant="gradient">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-12">
           <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">
@@ -76,18 +78,31 @@ const Testimonials: React.FC = () => {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {TESTIMONIALS.map((testimonial) => (
+          {TESTIMONIALS.map((testimonial) => {
+            const card3D = use3DCard({ intensity: 10, enableGlow: true });
+            return (
             <div
               key={testimonial.id}
-              className="bg-slate-900 border border-slate-800 rounded-xl p-6 hover:border-primary transition-all hover:shadow-lg hover:shadow-primary/10 flex flex-col"
+              ref={card3D.ref}
+              style={card3D.style}
+              onMouseMove={card3D.onMouseMove}
+              onMouseLeave={card3D.onMouseLeave}
+              onMouseEnter={card3D.onMouseEnter}
+              className="relative bg-slate-900/80 border border-slate-800/50 rounded-xl p-6 backdrop-blur-sm hover:border-primary transition-all flex flex-col group overflow-hidden"
             >
-              <Quote size={24} className="text-primary mb-4 opacity-50" />
-              
-              <p className="text-slate-300 mb-4 flex-1 italic">
-                "{testimonial.content}"
-              </p>
+              {/* Glow effect */}
+              <div 
+                className="absolute -inset-1 bg-gradient-to-r from-primary/20 via-secondary/20 to-primary/20 rounded-xl opacity-0 group-hover:opacity-100 blur-xl transition-opacity duration-500 -z-10"
+                style={card3D.glowStyle}
+              />
+              <div className="relative z-10">
+                <Quote size={24} className="text-primary mb-4 opacity-50" />
+                
+                <p className="text-slate-300 mb-4 flex-1 italic">
+                  "{testimonial.content}"
+                </p>
 
-              <div className="flex items-center justify-between pt-4 border-t border-slate-800">
+                <div className="flex items-center justify-between pt-4 border-t border-slate-800">
                 <div>
                   <div className="font-bold text-white">{testimonial.author}</div>
                   <div className="text-sm text-slate-400">{testimonial.role}</div>
@@ -102,8 +117,10 @@ const Testimonials: React.FC = () => {
                   ))}
                 </div>
               </div>
+              </div>
             </div>
-          ))}
+            );
+          })}
         </div>
 
         <div className="text-center mt-12">
@@ -112,7 +129,7 @@ const Testimonials: React.FC = () => {
           </p>
         </div>
       </div>
-    </section>
+    </SectionWrapper>
   );
 };
 

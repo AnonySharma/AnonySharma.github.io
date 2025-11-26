@@ -3,21 +3,22 @@ import { BrowserRouter, Routes, Route, useSearchParams } from 'react-router-dom'
 import { AchievementProvider, useAchievements } from './contexts/AchievementContext';
 import { ErrorProvider, ErrorNotifications, useErrors } from './contexts/ErrorContext';
 import { SoundProvider } from './contexts/SoundContext';
-import ErrorBoundary from './components/ErrorBoundary';
-import Navbar from './components/Navbar';
-import Hero from './components/Hero';
-import About from './components/About';
-import Skills from './components/Skills';
-import Projects from './components/Projects';
-import Contact from './components/Contact';
-import NotFound from './components/NotFound';
-import CodeSnippets from './components/CodeSnippets';
-import Testimonials from './components/Testimonials';
-import Achievements from './components/Achievements';
-import { Screensaver } from './components/Screensaver';
+import ErrorBoundary from './components/layout/ErrorBoundary';
+import Navbar from './components/layout/Navbar';
+import Hero from './components/sections/Hero';
+import About from './components/sections/About';
+import Skills from './components/sections/Skills';
+import Projects from './components/sections/Projects';
+import Contact from './components/sections/Contact';
+import NotFound from './components/ui/NotFound';
+import Achievements from './components/ui/Achievements';
 
-// Lazy load heavy components that are conditionally rendered
-const Terminal = lazy(() => import('./components/Terminal').catch(() => ({ default: () => null })));
+// Lazy load heavy components
+const Terminal = lazy(() => import('./components/terminal/Terminal').catch(() => ({ default: () => null })));
+const GlobalBackground = lazy(() => import('./components/effects/3D/GlobalBackground'));
+const Screensaver = lazy(() => import('./components/effects/Screensaver').then(m => ({ default: m.Screensaver })));
+const CodeSnippets = lazy(() => import('./components/sections/CodeSnippets'));
+const Testimonials = lazy(() => import('./components/sections/Testimonials'));
 
 function HomePage() {
   const [showTerminal, setShowTerminal] = useState(false);
@@ -192,8 +193,9 @@ function HomePage() {
 
 
   return (
-    <div className="min-h-screen bg-slate-950 text-slate-200 font-sans">
+    <div className="min-h-screen text-slate-200 font-sans relative">
       <Suspense fallback={null}>
+        <GlobalBackground />
         {showTerminal && (
           <Terminal 
             onClose={() => {
@@ -204,18 +206,22 @@ function HomePage() {
             isMinimized={isTerminalMinimized}
           />
         )}
+        <Screensaver />
       </Suspense>
       
       <Navbar onOpenTerminal={handleOpenTerminal} />
       <Achievements />
       <ErrorNotifications />
-      <Screensaver />
-      <main>
+      <main className="perspective-[2000px] transform-style-3d">
         <Hero />
         <Skills />
         <Projects />
-        <CodeSnippets />
-        <Testimonials />
+        <Suspense fallback={<div className="min-h-screen" />}>
+          <CodeSnippets />
+        </Suspense>
+        <Suspense fallback={<div className="min-h-screen" />}>
+          <Testimonials />
+        </Suspense>
         <About />
         <Contact />
       </main>

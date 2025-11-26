@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { Menu, X, Volume2, VolumeX } from 'lucide-react';
-import { useAchievements } from '../contexts/AchievementContext';
-import { useSound } from '../contexts/SoundContext';
-import { PROFILE_CONFIG, getDisplayName } from '../config';
+import { useAchievements } from '../../contexts/AchievementContext';
+import { useSound } from '../../contexts/SoundContext';
+import { PROFILE_CONFIG, getDisplayName } from '../../config';
 
 interface NavbarProps {
   onOpenTerminal: () => void;

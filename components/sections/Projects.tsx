@@ -1,30 +1,29 @@
 import React, { useState } from 'react';
-import { PROJECTS } from '../constants';
+import { PROJECTS } from '../../constants';
 import { Github } from 'lucide-react';
-import { useErrors } from '../contexts/ErrorContext';
-import { useGravity } from './terminal/hooks/useGravity';
+import { useErrors } from '../../contexts/ErrorContext';
+import { use3DCard } from '../hooks/use3DCard';
+import SectionWrapper from '../layout/SectionWrapper';
+import { animated } from '@react-spring/web';
 
 const ProjectCard: React.FC<{ project: any, onClick: () => void, loading: boolean }> = ({ project, onClick, loading }) => {
-    const gravity = useGravity(15); // Strength of 15px
+    const card3D = use3DCard({ intensity: 18, enableGlow: true });
 
     return (
         <div 
-            ref={gravity.ref}
-            style={gravity.style}
-            onMouseMove={gravity.onMouseMove}
-            onMouseLeave={gravity.onMouseLeave}
-            onTouchMove={gravity.onTouchMove}
-            onTouchEnd={(e) => {
-                // Handle gravity reset
-                if (gravity.onTouchEnd) {
-                    gravity.onTouchEnd();
-                }
-                // Small delay to allow gravity animation to complete, then trigger click
-                setTimeout(() => onClick(), 50);
-            }}
+            ref={card3D.ref}
+            style={card3D.style}
+            onMouseMove={card3D.onMouseMove}
+            onMouseLeave={card3D.onMouseLeave}
+            onMouseEnter={card3D.onMouseEnter}
             onClick={onClick}
-            className="group bg-slate-950 border border-slate-800 rounded-xl overflow-hidden hover:border-slate-600 transition-all hover:shadow-xl hover:shadow-primary/10 flex flex-col h-full cursor-pointer touch-manipulation"
+            className="group relative bg-slate-950/80 border border-slate-800/50 rounded-xl overflow-hidden backdrop-blur-sm transition-all hover:border-slate-600 flex flex-col h-full cursor-pointer touch-manipulation"
         >
+            {/* Glow effect */}
+            <animated.div 
+                className="absolute -inset-1 bg-gradient-to-r from-primary/30 via-secondary/30 to-primary/30 rounded-xl blur-xl transition-opacity duration-500 -z-10"
+                style={card3D.glowStyle}
+            />
             <div className="relative h-48 overflow-hidden bg-slate-800">
                 <img 
                     src={project.imageUrl} 
@@ -90,7 +89,7 @@ const Projects: React.FC = () => {
         errorTriggeredRef.current = true;
         addError(
           'Project Details Service Unavailable',
-          `Unable to fetch additional details for "${projectTitle}".\n\nError: ${error.message}\n\nThis might be due to:\n  - Network connectivity issues\n  - API service temporarily unavailable\n  - Rate limiting\n\nPlease try again later.\n\nStack trace:\n  at ProjectService.fetchDetails (api/projects.js:127:23)\n  at Projects.handleProjectClick (Projects.tsx:${Math.floor(Math.random() * 50) + 20}:15)`,
+          `Unable to fetch additional details for "${projectTitle}".\n\nError: ${error.message}\n\nThis might be due to:\n  - Network connectivity issues\n  - API service temporarily unavailable\n  - Rate limiting\n\nPlease try again later.\n\nStack trace:\n  at ProjectService.fetchDetails (api/projects.js:127:23)\n  at Projects.handleProjectClick (Projects.tsx:${Math.floor(Math.random() * 50) + 20}:15)\n\n---\n\n😄 Just kidding! This is a prank. There's no API - I just wanted to see your reaction! Check out my GitHub for the actual project details.`,
           'error'
         );
       }
@@ -100,7 +99,7 @@ const Projects: React.FC = () => {
   };
 
   return (
-    <section id="projects" className="py-24 bg-slate-900">
+    <SectionWrapper id="projects" variant="dark">
        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex flex-col md:flex-row justify-between items-end mb-12">
             <div>
@@ -122,7 +121,7 @@ const Projects: React.FC = () => {
             ))}
         </div>
        </div>
-    </section>
+    </SectionWrapper>
   );
 };
 

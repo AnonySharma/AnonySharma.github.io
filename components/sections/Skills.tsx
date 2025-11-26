@@ -1,7 +1,9 @@
 import React from 'react';
-import { SKILLS } from '../constants';
+import { SKILLS } from '../../constants';
 import { Code2, Cpu, Layout, Terminal } from 'lucide-react';
-import { useGravity } from './terminal/hooks/useGravity';
+import { use3DCard } from '../hooks/use3DCard';
+import SectionWrapper from '../layout/SectionWrapper';
+import { animated } from '@react-spring/web';
 
 const SkillCard: React.FC<{ 
   icon: React.ReactNode, 
@@ -11,23 +13,30 @@ const SkillCard: React.FC<{
   iconColorClass: string,
   hoverBgClass: string
 }> = ({ icon, title, skills, colorClass, iconColorClass, hoverBgClass }) => {
-  const gravity = useGravity(10);
+  const card3D = use3DCard({ intensity: 12, enableGlow: true });
 
   return (
     <div 
-      ref={gravity.ref}
-      style={gravity.style}
-      onMouseMove={gravity.onMouseMove}
-      onMouseLeave={gravity.onMouseLeave}
-      className={`bg-slate-800 p-8 rounded-2xl border border-slate-700 hover:${colorClass} transition-all group`}
+      ref={card3D.ref}
+      style={card3D.style}
+      onMouseMove={card3D.onMouseMove}
+      onMouseLeave={card3D.onMouseLeave}
+      onMouseEnter={card3D.onMouseEnter}
+      className={`relative bg-slate-800/80 p-8 rounded-2xl border border-slate-700/50 backdrop-blur-sm transition-all group overflow-hidden`}
     >
-      <div className={`w-12 h-12 bg-slate-900 rounded-lg flex items-center justify-center mb-6 group-hover:${hoverBgClass} transition-colors`}>
+      {/* Glow effect */}
+      <animated.div 
+        className="absolute -inset-1 bg-gradient-to-r from-primary/20 via-secondary/20 to-primary/20 rounded-2xl opacity-0 group-hover:opacity-100 blur-xl transition-opacity duration-500"
+        style={card3D.glowStyle as any}
+      />
+      
+      <div className={`relative z-10 w-12 h-12 bg-slate-900 rounded-lg flex items-center justify-center mb-6 group-hover:${hoverBgClass} transition-colors`}>
         <span className={iconColorClass}>{icon}</span>
       </div>
-      <h3 className="text-xl font-bold text-white mb-4">{title}</h3>
-      <div className="flex flex-wrap gap-2">
+      <h3 className="relative z-10 text-xl font-bold text-white mb-4">{title}</h3>
+      <div className="relative z-10 flex flex-wrap gap-2">
         {skills.map(skill => (
-          <span key={skill} className="px-3 py-1 bg-slate-900 text-slate-300 text-sm rounded-full border border-slate-700">
+          <span key={skill} className="px-3 py-1 bg-slate-900/80 text-slate-300 text-sm rounded-full border border-slate-700/50 backdrop-blur-sm">
             {skill}
           </span>
         ))}
@@ -38,7 +47,7 @@ const SkillCard: React.FC<{
 
 const Skills: React.FC = () => {
   return (
-    <section id="skills" className="py-20 bg-slate-900/50">
+    <SectionWrapper id="skills" variant="dark">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-16">
           <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">Technical Skills</h2>
@@ -79,7 +88,7 @@ const Skills: React.FC = () => {
           />
         </div>
       </div>
-    </section>
+    </SectionWrapper>
   );
 };
 

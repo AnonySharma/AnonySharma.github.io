@@ -1,5 +1,9 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
+// Import React-dependent libraries synchronously to ensure they initialize with React
+// This prevents initialization errors when lazy-loaded components try to use them
+import '@react-spring/web';
+import 'lucide-react';
 import './index.css';
 import './components/terminal/terminal.css';
 import App from './App';

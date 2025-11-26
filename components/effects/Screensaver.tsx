@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
-import { useAchievements } from '../contexts/AchievementContext';
+import { useAchievements } from '../../contexts/AchievementContext';
 
 const DVDLogo: React.FC<{ color: string }> = ({ color }) => (
   <div className="relative" style={{ width: '120px', height: '60px' }}>

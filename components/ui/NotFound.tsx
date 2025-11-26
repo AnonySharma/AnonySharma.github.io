@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import { Home, RefreshCw, Terminal, Keyboard, Sparkles } from 'lucide-react';
 import { Link } from 'react-router-dom';
-import { useAchievements } from '../contexts/AchievementContext';
+import { useAchievements } from '../../contexts/AchievementContext';
 
 const excuses = [
   "It worked on my machine.",

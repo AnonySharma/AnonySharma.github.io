@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Trophy, X, Sparkles } from 'lucide-react';
-import { useAchievements } from '../contexts/AchievementContext';
+import { useAchievements } from '../../contexts/AchievementContext';
 
 const Achievements: React.FC = () => {
   const { achievements, unlockedCount } = useAchievements();

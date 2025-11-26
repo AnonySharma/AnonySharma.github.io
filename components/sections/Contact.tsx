@@ -1,11 +1,12 @@
 import React from 'react';
 import { Mail, MapPin, Linkedin } from 'lucide-react';
-import { CONTACT_INFO } from '../constants';
-import { PROFILE_CONFIG } from '../config';
+import { CONTACT_INFO } from '../../constants';
+import { PROFILE_CONFIG } from '../../config';
+import SectionWrapper from '../layout/SectionWrapper';
 
 const Contact: React.FC = () => {
   return (
-    <section id="contact" className="py-24 bg-gradient-to-b from-slate-900 to-black border-t border-slate-800">
+    <SectionWrapper id="contact" variant="gradient">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
           <div>
@@ -92,7 +93,7 @@ const Contact: React.FC = () => {
           <p>&copy; {new Date().getFullYear()} {PROFILE_CONFIG.personal.fullName}. All rights reserved.</p>
         </div>
       </div>
-    </section>
+    </SectionWrapper>
   );
 };
 

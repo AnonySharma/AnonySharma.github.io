@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { Terminal, Coffee, Code2, Cpu } from 'lucide-react';
-import { useAchievements } from '../contexts/AchievementContext';
-import { PROFILE_CONFIG } from '../config';
+import { useAchievements } from '../../contexts/AchievementContext';
+import { PROFILE_CONFIG } from '../../config';
+import SectionWrapper from '../layout/SectionWrapper';
 
 const About: React.FC = () => {
   const { stats } = useAchievements();
@@ -14,7 +15,7 @@ const About: React.FC = () => {
   }, [stats.konami_unlocked]);
 
   return (
-    <section id="about" className="py-20 bg-slate-950 relative overflow-hidden">
+    <SectionWrapper id="about" variant="dark">
       {/* Background decoration */}
       <div className="absolute top-0 right-0 w-1/3 h-full bg-gradient-to-l from-primary/5 to-transparent"></div>
       
@@ -79,7 +80,7 @@ const About: React.FC = () => {
           </div>
         </div>
       </div>
-    </section>
+    </SectionWrapper>
   );
 };
 

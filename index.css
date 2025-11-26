@@ -41,6 +41,31 @@
 
 /* Terminal-specific styles moved to terminal.css */
 
+/* Code syntax highlighting styles */
+.line-number {
+  display: inline-block;
+  width: 3ch;
+  margin-right: 1ch;
+  text-align: right;
+  user-select: none;
+  opacity: 0.5;
+}
+
+pre code {
+  display: block;
+  white-space: pre;
+  overflow-x: auto;
+}
+
+pre code .line-number {
+  font-variant-numeric: tabular-nums;
+}
+
+/* Smooth scroll behavior */
+html {
+  scroll-behavior: smooth;
+}
+
 /* Ensure dark background classes work */
 .bg-slate-950 {
   background-color: #020617;
@@ -151,4 +176,16 @@
   touch-action: none; /* Prevent touch interference during animation */
   -webkit-transform: translateZ(0); /* Hardware acceleration for mobile */
   transform: translateZ(0);
+}
+
+/* Futuristic pulse animation for particle trails */
+@keyframes pulse {
+  0%, 100% {
+    opacity: 0.3;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.5);
+  }
 }
